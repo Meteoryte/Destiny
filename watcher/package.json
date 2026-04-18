@@ -1,0 +1,16 @@
+{
+  "name": "moonmoon-destiny-watcher",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Twitch API + OCR watcher for the Moonmoon Destiny Tracker site",
+  "type": "commonjs",
+  "scripts": {
+    "watch": "node watch.js",
+    "watch:once": "node watch.js --once"
+  },
+  "dependencies": {
+    "playwright": "^1.52.0",
+    "sharp": "^0.33.5",
+    "tesseract.js": "^5.1.1"
+  }
+}

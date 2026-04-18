@@ -1,0 +1,22 @@
+{
+  "channel": "moonmoon",
+  "page_url": "https://www.twitch.tv/moonmoon",
+  "source_mode": "live",
+  "live": false,
+  "title": "moonmoon unavailable",
+  "game_name": "Unknown",
+  "viewer_count": 0,
+  "started_at": null,
+  "attempt": null,
+  "ocr_confidence": 0,
+  "ocr_text": "",
+  "ocr_scope": "full_frame",
+  "last_update": "2026-04-18T07:55:14.140Z",
+  "watcher_status": "stream offline",
+  "screenshot_path": "latest-frame.png",
+  "crop_path": "latest-crop.png",
+  "notes": "stream offline; OCR skipped or retained previous value",
+  "delta": 6.3,
+  "chance": 0,
+  "volume": 8073206
+}

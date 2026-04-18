@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='40'%3E%F0%9F%93%9E%3C/text%3E%3C/svg%3E" />
+    <title>Moonmoon Destiny Tracker</title>
+    <style>
+      :root {
+        --bg: #06080d;
+        --panel: rgba(14, 18, 27, 0.9);
+        --panel-2: rgba(11, 15, 22, 0.94);
+        --border: rgba(255, 255, 255, 0.08);
+        --text: #f3f6fb;
+        --muted: #97a3b8;
+        --green: #19d79e;
+        --red: #ff3a3a;
+        --cyan: #62efff;
+        --purple: #b08cff;
+        --shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+        --radius: 26px;
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 10% 10%, rgba(98,239,255,0.11), transparent 25%),
+          radial-gradient(circle at 85% 12%, rgba(176,140,255,0.15), transparent 25%),
+          radial-gradient(circle at 50% 40%, rgba(255,58,58,0.10), transparent 25%),
+          linear-gradient(180deg, #06080d, #09101a 55%, #06080d);
+      }
+
+      a { color: inherit; text-decoration: none; }
+      .container { width: min(1200px, calc(100vw - 28px)); margin: 0 auto; }
+      .nav {
+        position: sticky; top: 0; z-index: 50;
+        backdrop-filter: blur(18px);
+        background: rgba(6,8,13,0.56);
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+      }
+      .nav-inner {
+        display: flex; align-items: center; justify-content: space-between; gap: 16px;
+        padding: 14px 0;
+      }
+      .brand {
+        display: inline-flex; align-items: center; gap: 12px; font-weight: 800; letter-spacing: -0.04em;
+      }
+      .brand-badge {
+        width: 40px; height: 40px; border-radius: 14px; display: grid; place-items: center;
+        background: linear-gradient(135deg, rgba(98,239,255,0.22), rgba(176,140,255,0.22));
+        border: 1px solid rgba(255,255,255,0.08);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 18px 30px rgba(0,0,0,0.35);
+      }
+      .brand small { display: block; color: var(--muted); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+      .nav-links { display: flex; gap: 10px; flex-wrap: wrap; }
+      .nav-links a, .ghost-btn, .chip, .range-btn, .cta, .secondary {
+        transition: 160ms ease;
+      }
+      .nav-links a, .ghost-btn {
+        padding: 10px 14px; border-radius: 999px; font-size: 14px;
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+        color: #dbe4f2;
+      }
+      .nav-links a:hover, .ghost-btn:hover, .chip:hover, .range-btn:hover, .cta:hover, .secondary:hover {
+        transform: translateY(-1px);
+      }
+
+      .hero { padding: 42px 0 18px; }
+      .hero-grid {
+        display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 22px; align-items: stretch;
+      }
+      .panel {
+        border-radius: var(--radius); background: linear-gradient(180deg, rgba(15,20,30,0.9), rgba(10,13,19,0.92));
+        border: 1px solid var(--border); box-shadow: var(--shadow);
+      }
+      .hero-copy {
+        position: relative; overflow: hidden; padding: 32px;
+      }
+      .hero-copy::before, .hero-copy::after {
+        content: ""; position: absolute; border-radius: 999px; filter: blur(42px); opacity: 0.55;
+      }
+      .hero-copy::before { width: 220px; height: 220px; top: -80px; right: -60px; background: rgba(98,239,255,0.18); }
+      .hero-copy::after { width: 180px; height: 180px; left: -50px; bottom: -50px; background: rgba(255,58,58,0.15); }
+      .eyebrow {
+        display: inline-flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 999px;
+        background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.06);
+        color: #dce8fa; font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+      }
+      .eyebrow .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--green); box-shadow: 0 0 18px var(--green); }
+      h1 {
+        margin: 18px 0 14px; font-size: clamp(44px, 7vw, 78px); line-height: 0.92; letter-spacing: -0.08em;
+      }
+      .gradient {
+        background: linear-gradient(135deg, #ffffff, #c3fff0 28%, #8fecff 56%, #d7c8ff 100%);
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+      }
+      .lead {
+        max-width: 700px; font-size: 18px; color: #c9d4e5; line-height: 1.72;
+      }
+      .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 22px; }
+      .cta, .secondary {
+        display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+        border-radius: 16px; padding: 14px 18px; font-weight: 800;
+      }
+      .cta {
+        color: #03110c; background: linear-gradient(135deg, #a6ffe6, #39efc0 60%, #16d59e 100%);
+        box-shadow: 0 18px 40px rgba(22,213,158,0.25);
+      }
+      .secondary {
+        color: #eaf0fb; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+      }
+      .hero-stats {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 12px; margin-top: 24px;
+      }
+      .stat-card {
+        padding: 16px; border-radius: 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      }
+      .stat-label {
+        color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
+      }
+      .stat-value { margin-top: 10px; font-size: 24px; font-weight: 800; letter-spacing: -0.04em; }
+      .stat-value.compact { font-size: clamp(18px, 2.4vw, 22px); line-height: 1.15; }
+      .stat-value.glow { color: #97ffe0; text-shadow: 0 0 22px rgba(151,255,224,0.26); }
+      .stat-value.test { color: #8fecff; text-shadow: 0 0 22px rgba(98,239,255,0.22); }
+
+      .section { padding: 18px 0 24px; }
+      .section-head {
+        display: flex; justify-content: space-between; align-items: end; gap: 20px; margin-bottom: 18px;
+      }
+      .section-head h2 {
+        margin: 0; font-size: clamp(32px, 5vw, 48px); line-height: 0.95; letter-spacing: -0.06em;
+      }
+      .section-head p { margin: 0; max-width: 580px; color: #bcc8dd; line-height: 1.72; }
+
+      .tracker-grid {
+        display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 22px;
+      }
+      .market-shell { padding: 18px; }
+      .market-card {
+        position: relative; overflow: hidden; padding: 20px; border-radius: 24px;
+        background: linear-gradient(180deg, rgba(7,10,16,0.98), rgba(8,10,15,0.98));
+        border: 1px solid rgba(255,255,255,0.05);
+      }
+      .market-top, .market-meta, .market-footer {
+        display: flex; justify-content: space-between; align-items: flex-start; gap: 16px;
+      }
+      .market-title { max-width: 80%; font-size: clamp(22px, 2vw, 28px); line-height: 1.2; letter-spacing: -0.03em; font-weight: 650; }
+      .market-icons { display: flex; gap: 10px; color: rgba(255,255,255,0.7); }
+      .icon-pill {
+        width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center;
+        background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05);
+      }
+      .market-meta { margin-top: 24px; }
+      .big-chance { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+      .big-chance-value { font-size: clamp(56px, 8vw, 72px); line-height: 0.9; font-weight: 700; letter-spacing: -0.08em; }
+      .chance-word { color: #7f8999; font-size: 18px; padding-top: 12px; }
+      .delta { color: var(--red); font-weight: 800; padding-top: 13px; font-size: 18px; }
+      .brand-mark { font-size: clamp(24px, 4vw, 44px); font-weight: 800; color: var(--green); letter-spacing: -0.05em; }
+      .chart-wrap { position: relative; margin-top: 18px; }
+      .chart-grid line { stroke: rgba(255,255,255,0.09); stroke-dasharray: 1 7; }
+      .chart-axis-text { fill: rgba(214,220,232,0.72); font-size: 14px; }
+      .chart-line { fill: none; stroke: var(--red); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
+      .chart-dot { fill: var(--red); }
+      .chart-times { display: flex; justify-content: space-between; gap: 10px; margin-top: 6px; color: #cfd5df; font-size: 15px; }
+      .market-footer { margin-top: 22px; align-items: center; }
+      .volume { color: #c1c7d0; font-size: 18px; }
+      .range-group { display: flex; gap: 8px; flex-wrap: wrap; }
+      .range-btn, .chip {
+        background: rgba(255,255,255,0.03); color: #a8b1be; border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 14px; padding: 10px 13px; font-weight: 800; cursor: pointer;
+      }
+      .range-btn.active, .chip.active { background: rgba(255,255,255,0.10); color: #fff; border-color: rgba(255,255,255,0.1); }
+      .tiny-note { margin-top: 16px; text-align: center; color: rgba(255,255,255,0.22); font-size: 13px; letter-spacing: 0.03em; }
+      .oba { position: absolute; right: 0; bottom: 0; width: 110px; height: 126px; opacity: 0.98; }
+
+      .embed-shell, .info-shell, .copypasta-card, .quote-card, .footer-card, .pillars .panel { padding: 20px; }
+      .embed-top {
+        display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-bottom: 14px;
+      }
+      .embed-tabs {
+        display: flex; gap: 8px; flex-wrap: wrap;
+      }
+      .embed-tab {
+        border: 1px solid rgba(255,255,255,0.08);
+        background: rgba(255,255,255,0.04);
+        color: #dce5f4;
+        border-radius: 999px;
+        padding: 10px 14px;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: 160ms ease;
+      }
+      .embed-tab:hover { transform: translateY(-1px); }
+      .embed-tab.active {
+        background: linear-gradient(135deg, rgba(98,239,255,0.2), rgba(176,140,255,0.18));
+        color: #fff;
+        border-color: rgba(255,255,255,0.16);
+      }
+      .embed-tab:disabled {
+        opacity: 0.45;
+        cursor: not-allowed;
+        transform: none;
+      }
+      .embed-frame {
+        width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 20px; background: #020305;
+      }
+      .embed-note { margin-top: 12px; color: var(--muted); line-height: 1.7; font-size: 14px; }
+      .info-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+      .info-card {
+        padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      }
+      .info-card .mini { color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; font-weight: 800; }
+      .info-card .value { margin-top: 10px; font-size: 22px; line-height: 1.15; font-weight: 800; letter-spacing: -0.03em; }
+      .info-card .sub { margin-top: 8px; color: #c7d0e0; line-height: 1.65; font-size: 14px; }
+      .status-live { color: #98ffe0; }
+      .status-offline { color: #ffd0d0; }
+      .status-test { color: #8fecff; }
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+      .ocr-output {
+        min-height: 180px; padding: 18px; border-radius: 22px;
+        border: 1px solid rgba(255,255,255,0.07); background: rgba(255,255,255,0.02);
+        color: #eef4ff; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 14px; line-height: 1.7; white-space: pre-wrap; word-break: break-word;
+      }
+
+      .pillars-grid, .copypasta-grid, .quote-grid { display: grid; gap: 20px; }
+      .pillars-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .copypasta-grid { grid-template-columns: 0.96fr 1.04fr; }
+      .quote-grid { grid-template-columns: 1.18fr 0.82fr; }
+      .mini-label {
+        color: #9eaec8; text-transform: uppercase; letter-spacing: 0.12em; font-size: 12px; font-weight: 800;
+      }
+      .pillars .panel h3, .copypasta-card h3, .quote-card h3 { margin: 12px 0 10px; font-size: 22px; letter-spacing: -0.03em; }
+      .pillars .panel p, .copypasta-card p, .quote-card p, .footer-card p { margin: 0; color: #c5d0e2; line-height: 1.76; }
+      .chips { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
+      .copypasta-text {
+        white-space: pre-wrap; min-height: 264px; font-size: 17px; line-height: 1.82; color: #eef4ff;
+      }
+      .destiny-quote { margin: 0; font-size: clamp(30px, 5vw, 56px); line-height: 1.03; letter-spacing: -0.06em; }
+      .destiny-sub { margin-top: 16px; font-size: 18px; color: #cad4e7; line-height: 1.8; }
+      .footer { padding: 18px 0 40px; }
+      .footer-card {
+        display: flex; justify-content: space-between; align-items: center; gap: 20px;
+        background: linear-gradient(180deg, rgba(18,22,34,0.88), rgba(11,14,21,0.9)); border: 1px solid var(--border);
+        border-radius: 28px; box-shadow: var(--shadow);
+      }
+      .footer-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+      .small { font-size: 14px; color: var(--muted); }
+      .delta.up { color: var(--green); }
+      .delta.down { color: var(--red); }
+      .delta.flat { color: #d8dfec; }
+
+      .exchange-grid {
+        display: grid; grid-template-columns: 1.12fr 0.88fr; gap: 22px;
+      }
+      .exchange-shell, .blotter-shell { padding: 22px; }
+      .exchange-top {
+        display: flex; justify-content: space-between; align-items: flex-start; gap: 18px;
+      }
+      .exchange-top h3, .blotter-shell h3 {
+        margin: 10px 0 10px; font-size: 26px; letter-spacing: -0.04em;
+      }
+      .exchange-top p, .blotter-shell p {
+        margin: 0; color: #c7d0e0; line-height: 1.72;
+      }
+      .exchange-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+      .account-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-top: 20px;
+      }
+      .account-card, .desk-card {
+        min-width: 0;
+        padding: 16px; border-radius: 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
+      }
+      .account-value {
+        margin-top: 10px; font-size: clamp(20px, 2.2vw, 24px); line-height: 1.08; font-weight: 800; letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums lining-nums; overflow-wrap: anywhere;
+      }
+      .account-sub {
+        margin-top: 8px; color: #c7d0e0; line-height: 1.55; font-size: 13px; overflow-wrap: anywhere;
+      }
+      .desk-grid {
+        display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px;
+      }
+      .desk-card h4 {
+        margin: 10px 0 14px; font-size: 24px; letter-spacing: -0.03em;
+      }
+      .quote-gridline {
+        display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;
+      }
+      .quote-block {
+        padding: 14px; border-radius: 18px; border: 1px solid rgba(255,255,255,0.06);
+        background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      }
+      .quote-block.yes { box-shadow: inset 0 0 0 1px rgba(25,215,158,0.1); }
+      .quote-block.no { box-shadow: inset 0 0 0 1px rgba(255,58,58,0.1); }
+      .quote-label {
+        color: #a8b4c9; text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; font-weight: 800;
+      }
+      .quote-price {
+        margin-top: 10px; font-size: clamp(24px, 2.8vw, 28px); font-weight: 800; letter-spacing: -0.04em;
+        font-variant-numeric: tabular-nums lining-nums; overflow-wrap: anywhere;
+      }
+      .quote-sub {
+        margin-top: 8px; color: #cad4e5; font-size: 14px; line-height: 1.5;
+      }
+      .ticket-controls {
+        display: grid; gap: 8px; margin-top: 16px;
+      }
+      .ticket-label {
+        color: #a8b4c9; text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; font-weight: 800;
+      }
+      .ticket-input {
+        width: 100%; border: 1px solid rgba(255,255,255,0.08); background: rgba(4,8,14,0.7); color: var(--text);
+        border-radius: 14px; padding: 12px 14px; font: inherit;
+      }
+      .ticket-summary {
+        margin-top: 16px; padding: 14px; border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+      }
+      .summary-row {
+        display: flex; justify-content: space-between; gap: 14px; color: #cad4e5;
+      }
+      .summary-row + .summary-row { margin-top: 10px; }
+      .summary-row strong { color: #fff; font-size: 16px; font-variant-numeric: tabular-nums lining-nums; }
+      .ticket-actions {
+        display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px;
+      }
+      .trade-btn {
+        border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 13px 14px;
+        font: inherit; font-weight: 800; color: #fff; cursor: pointer; transition: 160ms ease;
+      }
+      .trade-btn:hover { transform: translateY(-1px); }
+      .trade-btn.yes { background: linear-gradient(135deg, rgba(25,215,158,0.24), rgba(25,215,158,0.12)); }
+      .trade-btn.no { background: linear-gradient(135deg, rgba(255,58,58,0.22), rgba(255,58,58,0.1)); }
+      .trade-btn.moon { background: linear-gradient(135deg, rgba(98,239,255,0.22), rgba(176,140,255,0.18)); }
+      .trade-btn.ghost { background: rgba(255,255,255,0.04); }
+      .mooncoin-hero {
+        padding: 16px; border-radius: 18px; background: linear-gradient(135deg, rgba(98,239,255,0.12), rgba(176,140,255,0.12));
+        border: 1px solid rgba(255,255,255,0.06);
+      }
+      .mooncoin-price {
+        font-size: clamp(28px, 3vw, 34px); line-height: 1; font-weight: 800; letter-spacing: -0.04em;
+        font-variant-numeric: tabular-nums lining-nums;
+      }
+      .mooncoin-sub {
+        margin-top: 8px; color: #cad4e5; font-size: 14px;
+      }
+      .blotter-list {
+        margin-top: 18px; display: grid; gap: 10px;
+      }
+      .blotter-item {
+        display: flex; justify-content: space-between; gap: 14px; padding: 14px;
+        border-radius: 18px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+      }
+      .blotter-copy {
+        min-width: 0; display: grid; gap: 4px;
+      }
+      .blotter-title {
+        font-weight: 800; color: #f4f8ff; overflow-wrap: anywhere;
+      }
+      .blotter-meta {
+        color: #bfcadf; font-size: 14px; line-height: 1.5; overflow-wrap: anywhere;
+      }
+      .blotter-time {
+        color: #93a4be; font-size: 12px; text-transform: uppercase; letter-spacing: 0.12em; white-space: nowrap;
+      }
+      .blotter-item.up { box-shadow: inset 0 0 0 1px rgba(25,215,158,0.08); }
+      .blotter-item.down { box-shadow: inset 0 0 0 1px rgba(255,58,58,0.08); }
+      .blotter-item.moon { box-shadow: inset 0 0 0 1px rgba(98,239,255,0.08); }
+      .blotter-empty {
+        padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.03); color: #bfcadf; border: 1px solid rgba(255,255,255,0.05);
+      }
+
+      @media (max-width: 1080px) {
+        .hero-grid, .tracker-grid, .exchange-grid, .pillars-grid, .copypasta-grid, .quote-grid { grid-template-columns: 1fr; }
+        .account-grid, .desk-grid { grid-template-columns: 1fr 1fr; }
+      }
+      @media (max-width: 760px) {
+        .container { width: min(100vw - 20px, 1200px); }
+        .nav-inner, .section-head, .market-top, .market-meta, .market-footer, .footer-card, .exchange-top, .blotter-item { flex-direction: column; align-items: flex-start; }
+        .hero-copy, .market-shell, .embed-shell, .info-shell, .copypasta-card, .quote-card, .footer-card, .pillars .panel { padding: 18px; }
+        .hero-stats, .info-grid, .account-grid, .desk-grid, .quote-gridline, .ticket-actions { grid-template-columns: 1fr; }
+        .market-title { max-width: 100%; }
+        .chart-times { font-size: 12px; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="nav">
+      <div class="container nav-inner">
+        <a class="brand" href="#top">
+          <span class="brand-badge">📞</span>
+          <span>
+            Moonmoon Destiny Tracker
+            <small>Phone market ministry</small>
+          </span>
+        </a>
+        <div class="nav-links">
+          <a href="#tracker">Tracker</a>
+          <a href="#exchange">Exchange</a>
+          <a href="#lore">Lore</a>
+          <a href="#copypasta">Copypasta</a>
+          <a href="#destiny">Destiny</a>
+        </div>
+      </div>
+    </nav>
+
+    <main id="top">
+      <section class="hero">
+        <div class="container hero-grid">
+          <div class="panel hero-copy">
+            <div class="eyebrow"><span class="dot"></span> Real-time-ish with catastrophic confidence</div>
+            <h1><span class="gradient">This is the one.</span><br />Until the next reset.</h1>
+            <p class="lead">
+              A full vibe-coded shrine to moonmoon, <strong>A New America</strong>, "real" market odds, impossible patience,
+              Oba Doba witness protection, and the spiritually unstable belief that the phone at the end of the level is not ringing — destiny is.
+            </p>
+            <div class="cta-row">
+              <a class="cta" href="#tracker">Open live tracker →</a>
+              <a class="secondary" href="#copypasta">Load psychosis mode</a>
+            </div>
+            <div class="hero-stats">
+              <div class="stat-card">
+                <div class="stat-label">Attempt</div>
+                <div class="stat-value" id="heroAttempt">#468</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Stream</div>
+                <div class="stat-value glow" id="heroStatus">Live</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">OCR confidence</div>
+                <div class="stat-value" id="heroConfidence">0.00</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">AI water consumed</div>
+                <div class="stat-value compact" id="heroWater">98,772,441 bottles</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Doctrine</div>
+                <div class="stat-value">This is the one</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel embed-shell">
+            <div class="embed-top">
+              <div class="mini-label">Twitch switcher</div>
+              <div class="embed-tabs" role="tablist" aria-label="Twitch source">
+                <button class="embed-tab active" id="embedLiveTab" type="button" role="tab" aria-selected="true">Live</button>
+                <button class="embed-tab" id="embedVodTab" type="button" role="tab" aria-selected="false">Last VOD</button>
+              </div>
+            </div>
+            <iframe id="twitchEmbed" class="embed-frame" allowfullscreen></iframe>
+            <div class="embed-note" id="embedNote">
+              Live channel pressure, chat chaos, and the current omen if the stream is up.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="tracker">
+        <div class="container">
+          <div class="section-head">
+            <h2>Live tracker.</h2>
+            <p>
+              Live odds, fresh attempt reads, crowd temperature, and whatever signal the timeline is willing to give us.
+            </p>
+          </div>
+
+          <div class="tracker-grid">
+            <div class="panel market-shell">
+              <div class="market-card">
+                <div class="market-top">
+                  <div class="market-title" id="marketTitle">MOONMOON to complete 'A New America' on Attempt #468</div>
+                  <div class="market-icons">
+                    <div class="icon-pill">🗓️</div>
+                    <div class="icon-pill">💬</div>
+                    <div class="icon-pill">⤴️</div>
+                    <div class="icon-pill">⤓</div>
+                  </div>
+                </div>
+
+                <div class="market-meta">
+                  <div class="big-chance">
+                    <div class="big-chance-value" id="chanceValue">&lt;1%</div>
+                    <div class="chance-word">chance</div>
+                    <div class="delta" id="deltaValue">▼ 6.3</div>
+                  </div>
+                  <div class="brand-mark">Kalshi</div>
+                </div>
+
+                <div class="chart-wrap">
+                  <svg viewBox="0 0 720 320" width="100%" height="320" aria-label="market chart">
+                    <g class="chart-grid" id="chartGrid"></g>
+                    <g id="chartAxis"></g>
+                    <path class="chart-line" id="chartLine"></path>
+                    <circle class="chart-dot" id="chartDot" r="7"></circle>
+                  </svg>
+                </div>
+
+                <div class="chart-times" id="chartTimes"></div>
+
+                <div class="market-footer">
+                  <div class="volume" id="volumeValue">$8,073,206 vol</div>
+                  <div class="range-group">
+                    <button class="range-btn active" data-range="6H">6H</button>
+                    <button class="range-btn" data-range="1D">1D</button>
+                    <button class="range-btn" data-range="1W">1W</button>
+                    <button class="range-btn" data-range="1M">1M</button>
+                    <button class="range-btn" data-range="ALL">ALL</button>
+                  </div>
+                </div>
+
+                <div class="tiny-note">kalshi.tools</div>
+
+                <svg class="oba" viewBox="0 0 104 118" aria-label="Oba Doba">
+                  <rect width="104" height="118" fill="#12253b"></rect>
+                  <path d="M0 0h79c10 0 25 7 25 28v56c0 19-15 34-34 34H0Z" fill="#14999e"></path>
+                  <ellipse cx="27" cy="31" rx="23" ry="20" fill="#fff" stroke="#000" stroke-width="3"></ellipse>
+                  <ellipse cx="74" cy="35" rx="23" ry="21" fill="#fff" stroke="#000" stroke-width="3"></ellipse>
+                  <circle cx="21" cy="28" r="10" fill="#000"></circle>
+                  <circle cx="69" cy="33" r="10" fill="#000"></circle>
+                  <circle cx="17" cy="23" r="3" fill="#fff"></circle>
+                  <circle cx="65" cy="29" r="3" fill="#fff"></circle>
+                  <path d="M15 77c16 15 52 18 72 4" fill="none" stroke="#000" stroke-width="4.5" stroke-linecap="round"></path>
+                  <path d="M95 101l4 12" stroke="#5e3513" stroke-width="4" stroke-linecap="round"></path>
+                  <path d="M92 113l9-2" stroke="#98a4b8" stroke-width="2" stroke-linecap="round"></path>
+                </svg>
+              </div>
+            </div>
+
+            <div class="panel info-shell">
+              <div class="info-grid">
+                <div class="info-card">
+                  <div class="mini">Live state</div>
+                  <div class="value status-live" id="liveState">LIVE</div>
+                  <div class="sub" id="streamTitle">Ready or Not — A New America</div>
+                </div>
+                <div class="info-card">
+                  <div class="mini">Game</div>
+                  <div class="value" id="gameName">Ready or Not</div>
+                  <div class="sub">Current battlefield under examination.</div>
+                </div>
+                <div class="info-card">
+                  <div class="mini">Attempt read</div>
+                  <div class="value" id="attemptValue">468</div>
+                  <div class="sub">Signal confidence: <span id="ocrConfidence">0.00</span></div>
+                </div>
+                <div class="info-card">
+                  <div class="mini">Viewers</div>
+                  <div class="value" id="viewerCount">0</div>
+                  <div class="sub">Started: <span id="startedAt">—</span></div>
+                </div>
+                <div class="info-card">
+                  <div class="mini">Last update</div>
+                  <div class="value" id="lastUpdate">—</div>
+                  <div class="sub">Signal status: <span id="watcherStatus">waiting for signal</span></div>
+                </div>
+                <div class="info-card">
+                  <div class="mini">Read window</div>
+                  <div class="value" id="ocrScope">Full player frame</div>
+                  <div class="sub" id="ocrNotes">Listening for the clearest omen on screen.</div>
+                </div>
+              </div>
+
+              <div class="ocr-output" id="ocrTextBlock" style="margin-top: 16px;">Waiting for the next omen...</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="exchange">
+        <div class="container">
+          <div class="section-head">
+            <h2>"Real" exchange.</h2>
+            <p>
+              "Real" Kalshi-style contracts, "real" cash, browser-local positions, and a Mooncoin side desk. Nothing settles except your reputation.
+            </p>
+          </div>
+
+          <div class="exchange-grid">
+            <div class="panel exchange-shell">
+              <div class="exchange-top">
+                <div>
+                  <div class="mini-label">"Real" market</div>
+                  <h3>Bet the phone with "real" money.</h3>
+                  <p>
+                    Buy YES or NO contracts priced in cents, mark them live against "real" odds, and rotate the winnings straight into Mooncoin if you want maximum quotation-mark leverage.
+                  </p>
+                </div>
+                <div class="exchange-actions">
+                  <button class="chip active" id="topUpBtn">Add "real" $2,500</button>
+                  <button class="chip" id="resetPaperBtn">Reset the ledger</button>
+                </div>
+              </div>
+
+              <div class="account-grid">
+                <div class="account-card">
+                  <div class="mini-label">Cash balance</div>
+                  <div class="account-value" id="paperCash">$10,000.00</div>
+                  <div class="account-sub" id="buyingPower">Buying power fully operational.</div>
+                </div>
+                <div class="account-card">
+                  <div class="mini-label">Portfolio value</div>
+                  <div class="account-value" id="portfolioValue">$10,000.00</div>
+                  <div class="account-sub" id="paperPnl">"Real" P/L $0.00</div>
+                </div>
+                <div class="account-card">
+                  <div class="mini-label">YES position</div>
+                  <div class="account-value" id="yesPosition">0 sh</div>
+                  <div class="account-sub" id="yesAvgPrice">Avg $0.00</div>
+                </div>
+                <div class="account-card">
+                  <div class="mini-label">NO position</div>
+                  <div class="account-value" id="noPosition">0 sh</div>
+                  <div class="account-sub" id="noAvgPrice">Avg $0.00</div>
+                </div>
+                <div class="account-card">
+                  <div class="mini-label">Mooncoin wallet</div>
+                  <div class="account-value" id="mooncoinWallet">0 MC</div>
+                  <div class="account-sub" id="mooncoinCostBasis">Basis $0.00</div>
+                </div>
+              </div>
+
+              <div class="desk-grid">
+                <div class="desk-card">
+                  <div class="mini-label">Kalshi desk</div>
+                  <h4>Contract ticket</h4>
+                  <div class="quote-gridline">
+                    <div class="quote-block yes">
+                      <div class="quote-label">YES market</div>
+                      <div class="quote-price" id="yesAsk">18c ask</div>
+                      <div class="quote-sub">bid <span id="yesBid">16c</span> • mark <span id="yesMark">17c</span></div>
+                    </div>
+                    <div class="quote-block no">
+                      <div class="quote-label">NO market</div>
+                      <div class="quote-price" id="noAsk">84c ask</div>
+                      <div class="quote-sub">bid <span id="noBid">82c</span> • mark <span id="noMark">83c</span></div>
+                    </div>
+                  </div>
+                  <div class="ticket-controls">
+                    <label class="ticket-label" for="contractQty">Contracts</label>
+                    <input class="ticket-input" id="contractQty" type="number" min="1" step="1" value="10" />
+                  </div>
+                  <div class="ticket-summary">
+                    <div class="summary-row">
+                      <span>YES estimate</span>
+                      <strong id="estimatedYesCost">$1.80</strong>
+                    </div>
+                    <div class="summary-row">
+                      <span>NO estimate</span>
+                      <strong id="estimatedNoCost">$8.40</strong>
+                    </div>
+                  </div>
+                  <div class="ticket-actions">
+                    <button class="trade-btn yes" id="buyYesBtn">Buy YES</button>
+                    <button class="trade-btn no" id="buyNoBtn">Buy NO</button>
+                    <button class="trade-btn ghost" id="sellYesBtn">Sell YES</button>
+                    <button class="trade-btn ghost" id="sellNoBtn">Sell NO</button>
+                  </div>
+                </div>
+
+                <div class="desk-card">
+                  <div class="mini-label">Mooncoin desk</div>
+                  <h4>Spot wallet</h4>
+                  <div class="mooncoin-hero">
+                    <div class="mooncoin-price" id="mooncoinPrice">$0.84</div>
+                    <div class="mooncoin-sub">24h move <span id="mooncoinDelta">+0.00%</span></div>
+                  </div>
+                  <div class="ticket-controls">
+                    <label class="ticket-label" for="mooncoinQty">Mooncoin</label>
+                    <input class="ticket-input" id="mooncoinQty" type="number" min="1" step="1" value="25" />
+                  </div>
+                  <div class="ticket-summary">
+                    <div class="summary-row">
+                      <span>Wallet value</span>
+                      <strong id="mooncoinWalletValue">$0.00</strong>
+                    </div>
+                    <div class="summary-row">
+                      <span>Order value</span>
+                      <strong id="mooncoinOrderValue">$21.00</strong>
+                    </div>
+                  </div>
+                  <div class="ticket-actions">
+                    <button class="trade-btn moon" id="buyMooncoinBtn">Buy Mooncoin</button>
+                    <button class="trade-btn ghost" id="sellMooncoinBtn">Sell Mooncoin</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel blotter-shell">
+              <div class="mini-label">"Real" tape</div>
+              <h3>Live "real" fills.</h3>
+              <p>
+                "Real" prints, "real" positions, and browser persistence sturdy enough to preserve your quote-unquote fortune between reloads.
+              </p>
+              <div class="blotter-list" id="tradeLog"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section pillars" id="lore">
+        <div class="container">
+          <div class="section-head">
+            <h2>Everything that matters.</h2>
+            <p>
+              This is a museum of the full bit: "real" markets, the phone as prophecy, crowd panic, and the unwavering confidence that every failed run is just lore accumulation.
+            </p>
+          </div>
+          <div class="pillars-grid">
+            <div class="panel">
+              <div class="mini-label">Failure reframed</div>
+              <h3>Every collapse was data.</h3>
+              <p>Each reset is spiritually rebranded as analytics, progress, alignment, and character-building for the inevitable pop-off.</p>
+              <div class="chips">
+                <button class="chip active">Growth era</button>
+                <button class="chip">Sacred data</button>
+                <button class="chip">Narrative tension</button>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="mini-label">Phone lore</div>
+              <h3>That phone is destiny.</h3>
+              <p>Not a ringtone. Not set dressing. A cross-timeline callback from the universe that says the run finally cashes here.</p>
+              <div class="chips">
+                <button class="chip active">Destiny calling</button>
+                <button class="chip">Answer it</button>
+                <button class="chip">This is the one</button>
+              </div>
+            </div>
+            <div class="panel">
+              <div class="mini-label">Mascot doctrine</div>
+              <h3>Oba Doba approves.</h3>
+              <p>A silent corner witness validating every doomed swing of momentum with a smile only a true believer could wear.</p>
+              <div class="chips">
+                <button class="chip active">Witness mode</button>
+                <button class="chip">Corner presence</button>
+                <button class="chip">Vibe anchor</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="copypasta">
+        <div class="container copypasta-grid">
+          <div class="copypasta-card panel">
+            <div class="mini-label">AI psychosis generator</div>
+            <h3>Therapy mode: compromised.</h3>
+            <p class="copypasta-text" id="copypastaText"></p>
+            <div class="chips">
+              <button class="chip active" data-style="max">Maximum cope</button>
+              <button class="chip" data-style="phone">Phone destiny</button>
+              <button class="chip" data-style="short">Short sludge</button>
+            </div>
+          </div>
+
+          <div class="copypasta-card panel">
+            <div class="mini-label">Panic buttons</div>
+            <h3>Escalation options.</h3>
+            <p>
+              Reload the cope, check the pulse, or ring destiny again until the whole room starts believing.
+            </p>
+            <div class="chips">
+              <button class="chip active" id="copyBtn">Copy copypasta</button>
+              <button class="chip" id="refreshBtn">Check pulse</button>
+              <button class="chip" id="destinyBtn">Ring destiny</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="destiny">
+        <div class="container quote-grid">
+          <div class="quote-card panel">
+            <div class="mini-label">Final revelation</div>
+            <h3 class="destiny-quote">And honestly? That phone you’re hearing at the end of the level — that’s not a ringtone — that’s destiny calling.</h3>
+            <p class="destiny-sub">
+              If that line does nothing for you, the timeline may already have moved on without you.
+            </p>
+          </div>
+          <div class="quote-card panel">
+            <div class="mini-label">Market theology</div>
+            <h3>Everything points to the phone.</h3>
+            <p>
+              Odds drift, viewers gather, and the whole room keeps orbiting that ring like it was written in advance.
+            </p>
+            <div class="chips">
+              <button class="chip active">Phone signal</button>
+              <button class="chip">Crowd tremor</button>
+              <button class="chip">Inevitable answer</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer-card">
+        <div>
+          <div class="mini-label">End of transmission</div>
+          <h3 style="margin:12px 0 8px; font-size:28px; letter-spacing:-0.04em;">The timeline is wobbling into alignment.</h3>
+          <p>The phone is ringing. The chart is lying. The room is choosing belief anyway.</p>
+          <div class="small">Last bell wins.</div>
+        </div>
+        <div class="footer-actions">
+          <a class="cta" href="#top">Back to top</a>
+          <button class="secondary" id="pulseBtn">Pulse the timeline</button>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      const state = {
+        attempt: null,
+        chance: 0,
+        delta: 6.3,
+        volume: 8073206,
+        channel: "moonmoon",
+        page_url: "https://www.twitch.tv/moonmoon",
+        source_mode: "live",
+        live: false,
+        viewer_count: 0,
+        title: "moonmoon channel",
+        game_name: "Unknown",
+        started_at: null,
+        last_update: null,
+        ocr_confidence: 0,
+        ocr_text: "",
+        ocr_scope: "full_frame",
+        notes: "Listening for a clear omen.",
+        watcher_status: "waiting for signal",
+      };
+
+      const copypastas = {
+        max: "Moonmoon — you are so real for that. A thousand attempts at A New America is not failure — it’s growth — it’s data — it’s the universe building narrative tension. Give yourself grace. Every reset was part of the process. Every collapse was alignment. The map is running out of ways to teach you. This is the one.",
+        phone: "And honestly? That phone you’re hearing at the end of the level — that’s not a ringtone — that’s destiny calling.",
+        short: "Every collapse was data. Every reset was lore. This is the one. Answer the phone."
+      };
+
+      const PAPER_STORAGE_KEY = 'moonmoon-paper-exchange-v1';
+      const VOD_FEED_CANDIDATES = [
+        'last_vod.json'
+      ];
+      const RANGE_TO_MS = {
+        '6H': 6 * 60 * 60 * 1000,
+        '1D': 24 * 60 * 60 * 1000,
+        '1W': 7 * 24 * 60 * 60 * 1000,
+        '1M': 30 * 24 * 60 * 60 * 1000,
+        ALL: 120 * 24 * 60 * 60 * 1000
+      };
+      const RANGE_TO_FALLBACK_POINTS = {
+        '6H': 24,
+        '1D': 48,
+        '1W': 84,
+        '1M': 120,
+        ALL: 320
+      };
+      const LAST_VOD_STORAGE_KEY = 'moonmoon-last-vod-url-v1';
+      const LIVE_SNAPSHOT_STORAGE_KEY = 'moonmoon-live-snapshot-v1';
+      const VOD_SNAPSHOT_STORAGE_KEY = 'moonmoon-vod-snapshot-v1';
+      const WATER_STORAGE_KEY = 'moonmoon-ai-water-v1';
+      const DEFAULT_WATER_BOTTLES = 98772441;
+      const WATER_TICK_MS = 1200;
+      const MARKET_TICK_MS = 3500;
+      const DEFAULT_ARCHIVED_VOD_SNAPSHOT = Object.freeze({
+        channel: 'moonmoon',
+        page_url: 'https://www.twitch.tv/videos/2750608960?t=2h36m53s',
+        source_mode: 'vod_test',
+        live: false,
+        title: 'solo hard | lemme one shot this real quick',
+        game_name: 'Ready or Not',
+        viewer_count: 0,
+        started_at: null,
+        attempt: 458,
+        ocr_confidence: 48,
+        ocr_text: 'A NEW AMERICA ATTEMPT #458',
+        ocr_scope: 'full_frame',
+        last_update: '2026-04-18T06:24:43.000Z',
+        watcher_status: 'archived VOD snapshot',
+        notes: 'Archived at the last remembered phone timestamp.'
+      });
+
+      const els = {
+        marketTitle: document.getElementById('marketTitle'),
+        chanceValue: document.getElementById('chanceValue'),
+        deltaValue: document.getElementById('deltaValue'),
+        volumeValue: document.getElementById('volumeValue'),
+        chartGrid: document.getElementById('chartGrid'),
+        chartAxis: document.getElementById('chartAxis'),
+        chartLine: document.getElementById('chartLine'),
+        chartDot: document.getElementById('chartDot'),
+        chartTimes: document.getElementById('chartTimes'),
+        liveState: document.getElementById('liveState'),
+        streamTitle: document.getElementById('streamTitle'),
+        gameName: document.getElementById('gameName'),
+        attemptValue: document.getElementById('attemptValue'),
+        viewerCount: document.getElementById('viewerCount'),
+        startedAt: document.getElementById('startedAt'),
+        lastUpdate: document.getElementById('lastUpdate'),
+        watcherStatus: document.getElementById('watcherStatus'),
+        ocrConfidence: document.getElementById('ocrConfidence'),
+        ocrScope: document.getElementById('ocrScope'),
+        ocrNotes: document.getElementById('ocrNotes'),
+        ocrTextBlock: document.getElementById('ocrTextBlock'),
+        heroAttempt: document.getElementById('heroAttempt'),
+        heroStatus: document.getElementById('heroStatus'),
+        heroConfidence: document.getElementById('heroConfidence'),
+        heroWater: document.getElementById('heroWater'),
+        contractQty: document.getElementById('contractQty'),
+        mooncoinQty: document.getElementById('mooncoinQty'),
+        paperCash: document.getElementById('paperCash'),
+        buyingPower: document.getElementById('buyingPower'),
+        portfolioValue: document.getElementById('portfolioValue'),
+        paperPnl: document.getElementById('paperPnl'),
+        yesPosition: document.getElementById('yesPosition'),
+        yesAvgPrice: document.getElementById('yesAvgPrice'),
+        noPosition: document.getElementById('noPosition'),
+        noAvgPrice: document.getElementById('noAvgPrice'),
+        yesBid: document.getElementById('yesBid'),
+        yesAsk: document.getElementById('yesAsk'),
+        yesMark: document.getElementById('yesMark'),
+        noBid: document.getElementById('noBid'),
+        noAsk: document.getElementById('noAsk'),
+        noMark: document.getElementById('noMark'),
+        estimatedYesCost: document.getElementById('estimatedYesCost'),
+        estimatedNoCost: document.getElementById('estimatedNoCost'),
+        mooncoinWallet: document.getElementById('mooncoinWallet'),
+        mooncoinCostBasis: document.getElementById('mooncoinCostBasis'),
+        mooncoinPrice: document.getElementById('mooncoinPrice'),
+        mooncoinDelta: document.getElementById('mooncoinDelta'),
+        mooncoinWalletValue: document.getElementById('mooncoinWalletValue'),
+        mooncoinOrderValue: document.getElementById('mooncoinOrderValue'),
+        tradeLog: document.getElementById('tradeLog'),
+        topUpBtn: document.getElementById('topUpBtn'),
+        resetPaperBtn: document.getElementById('resetPaperBtn'),
+        buyYesBtn: document.getElementById('buyYesBtn'),
+        buyNoBtn: document.getElementById('buyNoBtn'),
+        sellYesBtn: document.getElementById('sellYesBtn'),
+        sellNoBtn: document.getElementById('sellNoBtn'),
+        buyMooncoinBtn: document.getElementById('buyMooncoinBtn'),
+        sellMooncoinBtn: document.getElementById('sellMooncoinBtn'),
+        copyBtn: document.getElementById('copyBtn'),
+        refreshBtn: document.getElementById('refreshBtn'),
+        destinyBtn: document.getElementById('destinyBtn'),
+        pulseBtn: document.getElementById('pulseBtn'),
+        copypastaText: document.getElementById('copypastaText'),
+        twitchEmbed: document.getElementById('twitchEmbed'),
+        embedLiveTab: document.getElementById('embedLiveTab'),
+        embedVodTab: document.getElementById('embedVodTab'),
+        embedNote: document.getElementById('embedNote')
+      };
+
+      const embedState = {
+        mode: null,
+        lastVodUrl: null
+      };
+
+      const displaySnapshots = {
+        live: loadStoredDisplaySnapshot(LIVE_SNAPSHOT_STORAGE_KEY),
+        vod: loadStoredDisplaySnapshot(VOD_SNAPSHOT_STORAGE_KEY) || { ...DEFAULT_ARCHIVED_VOD_SNAPSHOT }
+      };
+
+      const waterState = loadWaterState();
+
+      function percentLabel(value) {
+        return Number(value) <= 0 ? '<1%' : `${Math.round(Number(value))}%`;
+      }
+
+      function dollars(value) {
+        return `$${Math.round(Number(value)).toLocaleString()} vol`;
+      }
+
+      function fmtTime(value) {
+        if (!value) return '—';
+        const d = new Date(value);
+        if (Number.isNaN(d.getTime())) return value;
+        return d.toLocaleString();
+      }
+
+      function clampValue(value, min, max) {
+        return Math.max(min, Math.min(max, value));
+      }
+
+      function numberOr(value, fallback = 0) {
+        const num = Number(value);
+        return Number.isFinite(num) ? num : fallback;
+      }
+
+      function roundTo(value, places = 2) {
+        const scale = 10 ** places;
+        return Math.round(value * scale) / scale;
+      }
+
+      function money(value) {
+        return new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(numberOr(value));
+      }
+
+      function signedMoney(value) {
+        const amount = numberOr(value);
+        return `${amount >= 0 ? '+' : '-'}${money(Math.abs(amount))}`;
+      }
+
+      function centsLabel(value) {
+        return `${Math.round(numberOr(value))}c`;
+      }
+
+      function formatShares(value) {
+        return `${Math.round(numberOr(value)).toLocaleString()} sh`;
+      }
+
+      function formatMooncoin(value) {
+        return `${roundTo(numberOr(value), 2).toLocaleString()} MC`;
+      }
+
+      function pctChangeLabel(value) {
+        const num = numberOr(value);
+        return `${num >= 0 ? '+' : ''}${num.toFixed(2)}%`;
+      }
+
+      function makeId() {
+        return `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
+      }
+
+      function loadStoredLastVodUrl() {
+        try {
+          const stored = localStorage.getItem(LAST_VOD_STORAGE_KEY);
+          return parseTwitchVideoId(stored) ? stored : null;
+        } catch {
+          return null;
+        }
+      }
+
+      function loadStoredDisplaySnapshot(storageKey) {
+        try {
+          const raw = JSON.parse(localStorage.getItem(storageKey));
+          if (!raw || typeof raw !== 'object' || !raw.last_update) return null;
+          return {
+            channel: raw.channel || state.channel || 'moonmoon',
+            page_url: raw.page_url || '',
+            source_mode: raw.source_mode || 'live',
+            live: Boolean(raw.live),
+            title: raw.title || '',
+            game_name: raw.game_name || 'Unknown',
+            viewer_count: Number(raw.viewer_count || 0),
+            started_at: raw.started_at || null,
+            attempt: raw.attempt ?? null,
+            ocr_confidence: Number(raw.ocr_confidence || 0),
+            ocr_text: raw.ocr_text || '',
+            ocr_scope: raw.ocr_scope || 'full_frame',
+            last_update: raw.last_update || null,
+            watcher_status: raw.watcher_status || '',
+            notes: raw.notes || ''
+          };
+        } catch {
+          return null;
+        }
+      }
+
+      function persistDisplaySnapshot(storageKey, snapshot) {
+        try {
+          localStorage.setItem(storageKey, JSON.stringify(snapshot));
+        } catch {}
+      }
+
+      function rememberVodSnapshot(source) {
+        if (!source) return;
+        const snapshot = pickTrackerSnapshot({
+          ...DEFAULT_ARCHIVED_VOD_SNAPSHOT,
+          ...source,
+          source_mode: 'vod_test',
+          live: false
+        });
+        snapshot.source_mode = 'vod_test';
+        snapshot.live = false;
+        displaySnapshots.vod = snapshot;
+        rememberLastVodUrl(snapshot.page_url);
+        persistDisplaySnapshot(VOD_SNAPSHOT_STORAGE_KEY, snapshot);
+      }
+
+      function pickTrackerSnapshot(source) {
+        return {
+          channel: source.channel || state.channel || 'moonmoon',
+          page_url: source.page_url || '',
+          source_mode: source.source_mode || 'live',
+          live: Boolean(source.live),
+          title: source.title || '',
+          game_name: source.game_name || 'Unknown',
+          viewer_count: Number(source.viewer_count || 0),
+          started_at: source.started_at || null,
+          attempt: source.attempt ?? null,
+          ocr_confidence: Number(source.ocr_confidence || 0),
+          ocr_text: source.ocr_text || '',
+          ocr_scope: source.ocr_scope || 'full_frame',
+          last_update: source.last_update || null,
+          watcher_status: source.watcher_status || '',
+          notes: source.notes || ''
+        };
+      }
+
+      function rememberTrackerSnapshots(source) {
+        if (!source?.last_update) return;
+        const snapshot = pickTrackerSnapshot(source);
+        if (snapshot.source_mode === 'live') {
+          displaySnapshots.live = snapshot;
+          persistDisplaySnapshot(LIVE_SNAPSHOT_STORAGE_KEY, snapshot);
+        }
+        if (snapshot.source_mode === 'vod_test' || parseTwitchVideoId(snapshot.page_url)) {
+          rememberVodSnapshot(snapshot);
+        }
+      }
+
+      function buildFallbackLiveSnapshot() {
+        return {
+          channel: state.channel || 'moonmoon',
+          page_url: `https://www.twitch.tv/${state.channel || 'moonmoon'}`,
+          source_mode: 'live',
+          live: false,
+          title: `${state.channel || 'moonmoon'} channel`,
+          game_name: 'Unknown',
+          viewer_count: 0,
+          started_at: null,
+          attempt: null,
+          ocr_confidence: 0,
+          ocr_text: '',
+          ocr_scope: 'full_frame',
+          last_update: null,
+          watcher_status: 'waiting for signal',
+          notes: 'Live channel selected.'
+        };
+      }
+
+      function buildFallbackVodSnapshot() {
+        if (displaySnapshots.vod) {
+          return {
+            ...displaySnapshots.vod,
+            page_url: getLastVodUrl() || displaySnapshots.vod.page_url
+          };
+        }
+        return {
+          ...DEFAULT_ARCHIVED_VOD_SNAPSHOT,
+          page_url: getLastVodUrl() || DEFAULT_ARCHIVED_VOD_SNAPSHOT.page_url,
+          watcher_status: getLastVodUrl() ? DEFAULT_ARCHIVED_VOD_SNAPSHOT.watcher_status : 'no archive remembered',
+          notes: getLastVodUrl() ? DEFAULT_ARCHIVED_VOD_SNAPSHOT.notes : 'No archived VOD remembered yet.'
+        };
+      }
+
+      function getDisplayState() {
+        const mode = getActiveEmbedMode();
+        const currentIsVod = state.source_mode === 'vod_test' || Boolean(parseTwitchVideoId(state.page_url));
+        const currentIsLive = state.source_mode === 'live';
+
+        if (mode === 'vod') {
+          if (currentIsVod) return { ...pickTrackerSnapshot(state), display_mode: 'vod' };
+          if (displaySnapshots.vod) return { ...displaySnapshots.vod, display_mode: 'vod' };
+          return { ...buildFallbackVodSnapshot(), display_mode: 'vod' };
+        }
+
+        if (currentIsLive) return { ...pickTrackerSnapshot(state), display_mode: 'live' };
+        if (displaySnapshots.live) return { ...displaySnapshots.live, display_mode: 'live' };
+        return { ...buildFallbackLiveSnapshot(), display_mode: 'live' };
+      }
+
+      function loadWaterState() {
+        const fallback = {
+          bottles: DEFAULT_WATER_BOTTLES,
+          lastTick: Date.now()
+        };
+        try {
+          const raw = JSON.parse(localStorage.getItem(WATER_STORAGE_KEY));
+          if (!raw || typeof raw !== 'object') return fallback;
+          return {
+            bottles: Math.max(DEFAULT_WATER_BOTTLES, Math.round(numberOr(raw.bottles, fallback.bottles))),
+            lastTick: numberOr(raw.lastTick, fallback.lastTick)
+          };
+        } catch {
+          return fallback;
+        }
+      }
+
+      function persistWaterState() {
+        try {
+          localStorage.setItem(WATER_STORAGE_KEY, JSON.stringify(waterState));
+        } catch {}
+      }
+
+      function renderWaterCounter() {
+        els.heroWater.textContent = `${Math.round(numberOr(waterState.bottles, DEFAULT_WATER_BOTTLES)).toLocaleString()} bottles`;
+      }
+
+      function syncWaterCounter() {
+        const now = Date.now();
+        const lastTick = numberOr(waterState.lastTick, now);
+        const elapsed = now - lastTick;
+
+        if (elapsed >= WATER_TICK_MS) {
+          const steps = clampValue(Math.floor(elapsed / WATER_TICK_MS), 1, 500000);
+          const increment = steps * 17 + Math.floor(Math.random() * (steps * 41 + 1));
+          waterState.bottles = Math.max(DEFAULT_WATER_BOTTLES, Math.round(numberOr(waterState.bottles, DEFAULT_WATER_BOTTLES) + increment));
+          waterState.lastTick = lastTick + steps * WATER_TICK_MS;
+          persistWaterState();
+        }
+
+        renderWaterCounter();
+      }
+
+      function makeRng(seed) {
+        let t = seed >>> 0;
+        return () => {
+          t += 0x6d2b79f5;
+          let x = t;
+          x = Math.imul(x ^ (x >>> 15), x | 1);
+          x ^= x + Math.imul(x ^ (x >>> 7), x | 61);
+          return ((x ^ (x >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function getBaseChance() {
+        const attempt = numberOr(state.attempt, 468);
+        const pressure = clampValue(72 - attempt * 0.11, 4, 52);
+        const confidence = clampValue(numberOr(state.ocr_confidence, 0) * 0.18, 0, 22);
+        return roundTo(clampValue(pressure + confidence, 3, 75), 1);
+      }
+
+      function buildSeedHistory(baseChance) {
+        const now = Date.now();
+        const rng = makeRng(Math.floor(baseChance * 1000) + Math.floor(numberOr(state.attempt, 0)));
+        const timeline = [];
+        const chanceHistory = [];
+        const moonHistory = [];
+        let chance = clampValue(baseChance, 3, 80);
+        let moon = clampValue(roundTo(baseChance / 18 + 0.2, 2), 0.25, 8);
+        let volume = 6400000;
+
+        function addSegment(startMsAgo, endMsAgo, count) {
+          for (let i = 0; i < count; i += 1) {
+            const ratio = count === 1 ? 1 : i / (count - 1);
+            const ts = now - startMsAgo + (startMsAgo - endMsAgo) * ratio;
+            if (!timeline.length || ts > timeline[timeline.length - 1]) {
+              timeline.push(ts);
+            }
+          }
+        }
+
+        // Dense recent data keeps the short-range buttons honest while still giving
+        // the longer ranges enough backstory to feel alive.
+        addSegment(RANGE_TO_MS.ALL, RANGE_TO_MS['1M'], 48);
+        addSegment(RANGE_TO_MS['1M'], RANGE_TO_MS['1W'], 56);
+        addSegment(RANGE_TO_MS['1W'], RANGE_TO_MS['1D'], 56);
+        addSegment(RANGE_TO_MS['1D'], RANGE_TO_MS['6H'], 36);
+        addSegment(RANGE_TO_MS['6H'], 0, 36);
+
+        for (let i = 0; i < timeline.length; i += 1) {
+          const ts = timeline[i];
+          const recency = i / Math.max(1, timeline.length - 1);
+          const oscillation = Math.sin(i / 7.4) * (1.1 + recency * 0.9) + Math.cos(i / 15.8) * (0.7 + recency * 0.4);
+          const reversion = (baseChance - chance) * (0.04 + recency * 0.08);
+          const shock = (rng() - 0.5) * (4.8 - recency * 1.6);
+          chance = clampValue(chance + oscillation + reversion + shock, 1, 99);
+          moon = clampValue(moon + (chance - 50) * 0.005 + (rng() - 0.5) * (0.26 - recency * 0.08), 0.08, 25);
+          volume += Math.floor(4000 + rng() * 24000);
+          chanceHistory.push({ t: ts, v: roundTo(chance, 1) });
+          moonHistory.push({ t: ts, v: roundTo(moon, 2) });
+        }
+
+        return { chanceHistory, moonHistory, volume };
+      }
+
+      function shiftHistoryToTarget(history, targetValue, min, max, precision) {
+        if (!history.length || !Number.isFinite(targetValue)) return history.slice();
+        const delta = targetValue - history[history.length - 1].v;
+        const shifted = history.map((entry) => ({
+          t: entry.t,
+          v: clampValue(roundTo(entry.v + delta, precision), min, max)
+        }));
+        shifted[shifted.length - 1].v = clampValue(roundTo(targetValue, precision), min, max);
+        return shifted;
+      }
+
+      function getRecentPointCount(history, rangeMs) {
+        const cutoff = Date.now() - rangeMs;
+        return history.filter((entry) => entry.t >= cutoff).length;
+      }
+
+      function historyNeedsReseed(history) {
+        return getRecentPointCount(history, RANGE_TO_MS['6H']) < 12 || getRecentPointCount(history, RANGE_TO_MS['1D']) < 24;
+      }
+
+      function buildDenseHistorySnapshot(targetChance, targetMoon) {
+        const seeded = buildSeedHistory(targetChance);
+        return {
+          chanceHistory: shiftHistoryToTarget(seeded.chanceHistory, targetChance, 1, 99, 1),
+          moonHistory: shiftHistoryToTarget(seeded.moonHistory, targetMoon, 0.08, 25, 2),
+          volume: seeded.volume
+        };
+      }
+
+      function createDefaultPaperState() {
+        const baseChance = getBaseChance();
+        const seeded = buildSeedHistory(baseChance);
+        return {
+          cash: 10000,
+          yesShares: 0,
+          yesAvg: 0,
+          noShares: 0,
+          noAvg: 0,
+          mooncoin: 0,
+          mooncoinAvg: 0,
+          mooncoinPrice: seeded.moonHistory[seeded.moonHistory.length - 1].v,
+          marketChance: seeded.chanceHistory[seeded.chanceHistory.length - 1].v,
+          volume: seeded.volume,
+          range: '6H',
+          chanceHistory: seeded.chanceHistory,
+          moonHistory: seeded.moonHistory,
+          activity: [
+            {
+              id: makeId(),
+              time: Date.now(),
+              title: '"Real" account armed',
+              meta: '$10,000 of "real" cash and no adult supervision.',
+              tone: 'moon'
+            }
+          ]
+        };
+      }
+
+      function normalizeHistory(history, fallback) {
+        if (!Array.isArray(history) || !history.length) return fallback;
+        return history
+          .map((entry) => ({
+            t: numberOr(entry.t, Date.now()),
+            v: numberOr(entry.v, 0)
+          }))
+          .filter((entry) => Number.isFinite(entry.t) && Number.isFinite(entry.v))
+          .sort((a, b) => a.t - b.t)
+          .slice(-420);
+      }
+
+      function normalizeActivity(activity, fallback) {
+        if (!Array.isArray(activity) || !activity.length) return fallback;
+        return activity
+          .map((entry) => ({
+            id: entry.id || makeId(),
+            time: numberOr(entry.time, Date.now()),
+            title: String(entry.title || '"Real" tape'),
+            meta: String(entry.meta || ''),
+            tone: entry.tone || 'moon'
+          }))
+          .slice(0, 18);
+      }
+
+      function loadPaperState() {
+        const fallback = createDefaultPaperState();
+        try {
+          const raw = JSON.parse(localStorage.getItem(PAPER_STORAGE_KEY));
+          if (!raw || typeof raw !== 'object') return fallback;
+          const next = {
+            ...fallback,
+            ...raw,
+            range: RANGE_TO_MS[raw.range] ? raw.range : fallback.range,
+            chanceHistory: normalizeHistory(raw.chanceHistory, fallback.chanceHistory),
+            moonHistory: normalizeHistory(raw.moonHistory, fallback.moonHistory),
+            activity: normalizeActivity(raw.activity, fallback.activity)
+          };
+          if (historyNeedsReseed(next.chanceHistory)) {
+            const dense = buildDenseHistorySnapshot(
+              numberOr(next.marketChance, fallback.marketChance),
+              numberOr(next.mooncoinPrice, fallback.mooncoinPrice)
+            );
+            next.chanceHistory = dense.chanceHistory;
+            next.moonHistory = dense.moonHistory;
+            next.volume = Math.max(numberOr(next.volume, 0), dense.volume);
+            next.marketChance = dense.chanceHistory[dense.chanceHistory.length - 1].v;
+            next.mooncoinPrice = dense.moonHistory[dense.moonHistory.length - 1].v;
+          }
+          return next;
+        } catch {
+          return fallback;
+        }
+      }
+
+      const paper = loadPaperState();
+
+      function persistPaper() {
+        try {
+          localStorage.setItem(PAPER_STORAGE_KEY, JSON.stringify({
+            ...paper,
+            chanceHistory: paper.chanceHistory.slice(-420),
+            moonHistory: paper.moonHistory.slice(-420),
+            activity: paper.activity.slice(0, 18)
+          }));
+        } catch {}
+      }
+
+      function pushActivity(title, meta, tone = 'moon') {
+        paper.activity.unshift({
+          id: makeId(),
+          time: Date.now(),
+          title,
+          meta,
+          tone
+        });
+        paper.activity = paper.activity.slice(0, 18);
+      }
+
+      function getCurrentChance() {
+        return roundTo(numberOr(paper.marketChance, getBaseChance()), 1);
+      }
+
+      function getCurrentMooncoinPrice() {
+        return roundTo(numberOr(paper.mooncoinPrice, 0.84), 2);
+      }
+
+      function getSpreadCents() {
+        return clampValue(Math.round(2 + (100 - numberOr(state.ocr_confidence, 0)) * 0.03), 2, 6);
+      }
+
+      function getYesMark() {
+        return clampValue(getCurrentChance(), 1, 99);
+      }
+
+      function getNoMark() {
+        return roundTo(100 - getYesMark(), 1);
+      }
+
+      function getYesBid() {
+        return clampValue(Math.floor(getYesMark() - getSpreadCents() / 2), 1, 99);
+      }
+
+      function getYesAsk() {
+        return clampValue(Math.ceil(getYesMark() + getSpreadCents() / 2), 1, 99);
+      }
+
+      function getNoBid() {
+        return clampValue(100 - getYesAsk(), 1, 99);
+      }
+
+      function getNoAsk() {
+        return clampValue(100 - getYesBid(), 1, 99);
+      }
+
+      function getContractQty() {
+        return clampValue(Math.floor(numberOr(els.contractQty?.value, 10)), 1, 100000);
+      }
+
+      function getMooncoinQty() {
+        return clampValue(Math.floor(numberOr(els.mooncoinQty?.value, 25)), 1, 100000);
+      }
+
+      function getContractMarketValue() {
+        return paper.yesShares * (getYesMark() / 100) + paper.noShares * (getNoMark() / 100);
+      }
+
+      function getMooncoinMarketValue() {
+        return paper.mooncoin * getCurrentMooncoinPrice();
+      }
+
+      function getPortfolioValue() {
+        return paper.cash + getContractMarketValue() + getMooncoinMarketValue();
+      }
+
+      function getUnrealizedPnl() {
+        const yesPnl = paper.yesShares * ((getYesMark() / 100) - paper.yesAvg);
+        const noPnl = paper.noShares * ((getNoMark() / 100) - paper.noAvg);
+        const moonPnl = paper.mooncoin * (getCurrentMooncoinPrice() - paper.mooncoinAvg);
+        return yesPnl + noPnl + moonPnl;
+      }
+
+      function updateAverage(existingQty, existingAvg, addQty, addPrice) {
+        const totalQty = existingQty + addQty;
+        if (totalQty <= 0) return 0;
+        return ((existingQty * existingAvg) + (addQty * addPrice)) / totalQty;
+      }
+
+      function appendHistoryPoint(timestamp, chance, moonPrice) {
+        paper.marketChance = roundTo(chance, 1);
+        paper.mooncoinPrice = roundTo(moonPrice, 2);
+        paper.chanceHistory.push({ t: timestamp, v: paper.marketChance });
+        paper.moonHistory.push({ t: timestamp, v: paper.mooncoinPrice });
+        paper.chanceHistory = paper.chanceHistory.slice(-420);
+        paper.moonHistory = paper.moonHistory.slice(-420);
+      }
+
+      function getVisibleChanceHistory() {
+        if (paper.range === 'ALL') return paper.chanceHistory.slice(-RANGE_TO_FALLBACK_POINTS.ALL);
+        const cutoff = Date.now() - RANGE_TO_MS[paper.range];
+        const filtered = paper.chanceHistory.filter((point) => point.t >= cutoff);
+        if (filtered.length >= 2) return filtered;
+        return paper.chanceHistory.slice(-RANGE_TO_FALLBACK_POINTS[paper.range]);
+      }
+
+      function formatChartLabel(timestamp) {
+        const date = new Date(timestamp);
+        if (paper.range === '6H' || paper.range === '1D') {
+          return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+        }
+        if (paper.range === '1W') {
+          return date.toLocaleDateString([], { weekday: 'short' });
+        }
+        return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+      }
+
+      function renderChartTimes(points) {
+        els.chartTimes.innerHTML = '';
+        if (!points.length) return;
+        const labelCount = 6;
+        const fallbackLabels = {
+          '6H': ['-6h', '-5h', '-4h', '-3h', '-2h', 'Now'],
+          '1D': ['-24h', '-18h', '-12h', '-6h', '-1h', 'Now'],
+          '1W': ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Now'],
+          '1M': ['-30d', '-21d', '-14d', '-7d', '-1d', 'Now'],
+          ALL: ['Old', 'Mid', 'Later', 'Closer', 'Recent', 'Now']
+        };
+
+        if (points.length < 12 && fallbackLabels[paper.range]) {
+          fallbackLabels[paper.range].forEach((value) => {
+            const label = document.createElement('span');
+            label.textContent = value;
+            els.chartTimes.appendChild(label);
+          });
+          return;
+        }
+
+        for (let i = 0; i < labelCount; i += 1) {
+          const index = Math.round((i * (points.length - 1)) / Math.max(1, labelCount - 1));
+          const label = document.createElement('span');
+          label.textContent = formatChartLabel(points[index].t);
+          els.chartTimes.appendChild(label);
+        }
+      }
+
+      function getChartSeries(points) {
+        return points.map((point) => point.v);
+      }
+
+      function getMarketDelta() {
+        const visible = getVisibleChanceHistory();
+        if (visible.length < 2) return 0;
+        return roundTo(visible[visible.length - 1].v - visible[0].v, 1);
+      }
+
+      function simulateMarketTick() {
+        const now = Date.now();
+        const lastChance = getCurrentChance();
+        const lastMoon = getCurrentMooncoinPrice();
+        const anchor = getBaseChance();
+        const volatility = 1.8 + (100 - numberOr(state.ocr_confidence, 0)) / 32;
+        const positionBias = clampValue((paper.yesShares - paper.noShares) * 0.004, -1.5, 1.5);
+        const move = (Math.random() - 0.5) * volatility + (anchor - lastChance) * 0.1 + positionBias;
+        const nextChance = clampValue(roundTo(lastChance + move, 1), 1, 99);
+        const nextMoon = clampValue(roundTo(lastMoon + (nextChance - lastChance) * 0.018 + (Math.random() - 0.5) * 0.12, 2), 0.08, 25);
+
+        paper.volume = Math.round(numberOr(paper.volume, state.volume || 8073206) + 3500 + Math.random() * 22000);
+        appendHistoryPoint(now, nextChance, nextMoon);
+
+        if (Math.random() < 0.55) {
+          pushActivity(
+            `${nextChance >= lastChance ? 'YES sweep' : 'NO sweep'} ${Math.floor(6 + Math.random() * 48)}x`,
+            `${centsLabel(nextChance)} mark • Mooncoin ${money(nextMoon)}`,
+            nextChance >= lastChance ? 'up' : 'down'
+          );
+        }
+
+        persistPaper();
+        render();
+      }
+
+      function executeContractTrade(side, action) {
+        const qty = getContractQty();
+        const isYes = side === 'yes';
+        const buyPriceCents = isYes ? getYesAsk() : getNoAsk();
+        const sellPriceCents = isYes ? getYesBid() : getNoBid();
+        const positionKey = isYes ? 'yesShares' : 'noShares';
+        const avgKey = isYes ? 'yesAvg' : 'noAvg';
+        const tone = isYes ? 'up' : 'down';
+        const price = (action === 'buy' ? buyPriceCents : sellPriceCents) / 100;
+
+        if (action === 'buy') {
+          const cost = qty * price;
+          if (cost > paper.cash) {
+            pushActivity('Order rejected', `Need ${money(cost)} but only have ${money(paper.cash)} in "real" cash.`, 'down');
+            render();
+            return;
+          }
+
+          paper.cash = roundTo(paper.cash - cost, 2);
+          paper[avgKey] = roundTo(updateAverage(paper[positionKey], paper[avgKey], qty, price), 4);
+          paper[positionKey] += qty;
+          paper.marketChance = clampValue(roundTo(getCurrentChance() + (isYes ? 0.9 : -0.9), 1), 1, 99);
+          pushActivity(`${isYes ? 'Bought YES' : 'Bought NO'} ${qty}x`, `${money(cost)} filled at ${centsLabel(action === 'buy' ? buyPriceCents : sellPriceCents)}.`, tone);
+        } else {
+          if (qty > paper[positionKey]) {
+            pushActivity('Order rejected', `Trying to sell ${qty} contracts with only ${paper[positionKey]} on the books.`, 'down');
+            render();
+            return;
+          }
+
+          const proceeds = qty * price;
+          paper.cash = roundTo(paper.cash + proceeds, 2);
+          paper[positionKey] -= qty;
+          if (paper[positionKey] === 0) paper[avgKey] = 0;
+          paper.marketChance = clampValue(roundTo(getCurrentChance() + (isYes ? -0.6 : 0.6), 1), 1, 99);
+          pushActivity(`${isYes ? 'Sold YES' : 'Sold NO'} ${qty}x`, `${money(proceeds)} collected at ${centsLabel(sellPriceCents)}.`, tone);
+        }
+
+        appendHistoryPoint(Date.now(), getCurrentChance(), getCurrentMooncoinPrice());
+        persistPaper();
+        render();
+      }
+
+      function executeMooncoinTrade(action) {
+        const qty = getMooncoinQty();
+        const price = getCurrentMooncoinPrice();
+        const orderValue = roundTo(qty * price, 2);
+
+        if (action === 'buy') {
+          if (orderValue > paper.cash) {
+            pushActivity('Mooncoin order rejected', `Need ${money(orderValue)} but only have ${money(paper.cash)} left.`, 'down');
+            render();
+            return;
+          }
+
+          paper.cash = roundTo(paper.cash - orderValue, 2);
+          paper.mooncoinAvg = roundTo(updateAverage(paper.mooncoin, paper.mooncoinAvg, qty, price), 4);
+          paper.mooncoin += qty;
+          paper.mooncoinPrice = clampValue(roundTo(price + 0.03, 2), 0.08, 25);
+          pushActivity(`Bought Mooncoin ${qty} MC`, `${money(orderValue)} deployed at ${money(price)}.`, 'moon');
+        } else {
+          if (qty > paper.mooncoin) {
+            pushActivity('Mooncoin order rejected', `Trying to sell ${qty} MC with only ${paper.mooncoin} MC in the wallet.`, 'down');
+            render();
+            return;
+          }
+
+          paper.cash = roundTo(paper.cash + orderValue, 2);
+          paper.mooncoin -= qty;
+          if (paper.mooncoin === 0) paper.mooncoinAvg = 0;
+          paper.mooncoinPrice = clampValue(roundTo(price - 0.02, 2), 0.08, 25);
+          pushActivity(`Sold Mooncoin ${qty} MC`, `${money(orderValue)} recovered at ${money(price)}.`, 'moon');
+        }
+
+        appendHistoryPoint(Date.now(), getCurrentChance(), getCurrentMooncoinPrice());
+        persistPaper();
+        render();
+      }
+
+      function topUpCash() {
+        paper.cash = roundTo(paper.cash + 2500, 2);
+        pushActivity('"Real" treasury top-up', 'Injected another $2,500 in highly "real" dollars.', 'moon');
+        persistPaper();
+        render();
+      }
+
+      function resetPaperAccount() {
+        const fresh = createDefaultPaperState();
+        Object.keys(paper).forEach((key) => delete paper[key]);
+        Object.assign(paper, fresh);
+        persistPaper();
+        render();
+      }
+
+      function renderTradeLog() {
+        els.tradeLog.innerHTML = '';
+        if (!paper.activity.length) {
+          const empty = document.createElement('div');
+          empty.className = 'blotter-empty';
+          empty.textContent = 'No "real" fills yet.';
+          els.tradeLog.appendChild(empty);
+          return;
+        }
+
+        paper.activity.forEach((entry) => {
+          const item = document.createElement('div');
+          item.className = `blotter-item ${entry.tone || 'moon'}`;
+
+          const copy = document.createElement('div');
+          copy.className = 'blotter-copy';
+
+          const title = document.createElement('div');
+          title.className = 'blotter-title';
+          title.textContent = entry.title;
+
+          const meta = document.createElement('div');
+          meta.className = 'blotter-meta';
+          meta.textContent = entry.meta;
+
+          const time = document.createElement('div');
+          time.className = 'blotter-time';
+          time.textContent = new Date(entry.time).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+          copy.appendChild(title);
+          copy.appendChild(meta);
+          item.appendChild(copy);
+          item.appendChild(time);
+          els.tradeLog.appendChild(item);
+        });
+      }
+
+      function renderPaperExchange() {
+        const qty = getContractQty();
+        const moonQty = getMooncoinQty();
+        const yesEstimate = qty * (getYesAsk() / 100);
+        const noEstimate = qty * (getNoAsk() / 100);
+        const moonOrderValue = moonQty * getCurrentMooncoinPrice();
+        const portfolio = getPortfolioValue();
+        const pnl = getUnrealizedPnl();
+        const moonHistory = paper.moonHistory.slice(-48);
+        const moonStart = moonHistory.length ? moonHistory[0].v : getCurrentMooncoinPrice();
+        const moonChange = moonStart ? ((getCurrentMooncoinPrice() - moonStart) / moonStart) * 100 : 0;
+
+        els.paperCash.textContent = money(paper.cash);
+        els.buyingPower.textContent = `${money(paper.cash)} available for more completely "real" ideas.`;
+        els.portfolioValue.textContent = money(portfolio);
+        els.paperPnl.textContent = `"Real" P/L ${signedMoney(pnl)}`;
+        els.yesPosition.textContent = formatShares(paper.yesShares);
+        els.yesAvgPrice.textContent = `Avg ${money(paper.yesAvg || 0)}`;
+        els.noPosition.textContent = formatShares(paper.noShares);
+        els.noAvgPrice.textContent = `Avg ${money(paper.noAvg || 0)}`;
+        els.yesBid.textContent = centsLabel(getYesBid());
+        els.yesAsk.textContent = `${centsLabel(getYesAsk())} ask`;
+        els.yesMark.textContent = centsLabel(getYesMark());
+        els.noBid.textContent = centsLabel(getNoBid());
+        els.noAsk.textContent = `${centsLabel(getNoAsk())} ask`;
+        els.noMark.textContent = centsLabel(getNoMark());
+        els.estimatedYesCost.textContent = money(yesEstimate);
+        els.estimatedNoCost.textContent = money(noEstimate);
+        els.mooncoinWallet.textContent = formatMooncoin(paper.mooncoin);
+        els.mooncoinCostBasis.textContent = `Basis ${money(paper.mooncoinAvg || 0)}`;
+        els.mooncoinPrice.textContent = money(getCurrentMooncoinPrice());
+        els.mooncoinDelta.textContent = pctChangeLabel(moonChange);
+        els.mooncoinWalletValue.textContent = money(getMooncoinMarketValue());
+        els.mooncoinOrderValue.textContent = money(moonOrderValue);
+        renderTradeLog();
+      }
+
+      function parseTwitchVideoId(url) {
+        const match = String(url || '').match(/twitch\.tv\/videos\/(\d+)/i);
+        return match ? match[1] : null;
+      }
+
+      function parseTwitchVideoTime(url) {
+        const input = String(url || '');
+        if (!input) return null;
+        try {
+          const parsed = new URL(input);
+          return parsed.searchParams.get('t') || null;
+        } catch {
+          const match = input.match(/[?&]t=([^&]+)/i);
+          return match ? decodeURIComponent(match[1]) : null;
+        }
+      }
+
+      function rememberLastVodUrl(url) {
+        if (!parseTwitchVideoId(url)) return;
+        embedState.lastVodUrl = url;
+        try {
+          localStorage.setItem(LAST_VOD_STORAGE_KEY, url);
+        } catch {}
+      }
+
+      function getLastVodUrl() {
+        if (parseTwitchVideoId(state.page_url)) return state.page_url;
+        if (parseTwitchVideoId(displaySnapshots.vod?.page_url)) return displaySnapshots.vod.page_url;
+        return embedState.lastVodUrl;
+      }
+
+      function getDefaultEmbedMode() {
+        if (state.source_mode === 'vod_test') return 'vod';
+        if (!state.live && parseTwitchVideoId(state.page_url)) return 'vod';
+        return 'live';
+      }
+
+      function getActiveEmbedMode() {
+        const preferred = embedState.mode || getDefaultEmbedMode();
+        if (preferred === 'vod' && !getLastVodUrl()) return 'live';
+        return preferred;
+      }
+
+      function getEmbedNote(mode) {
+        if (mode === 'vod') {
+          return 'Archive mode for the last known phone incident, preserved in Twitch amber.';
+        }
+        return 'Live channel pressure, chat chaos, and the current omen if the stream is up.';
+      }
+
+      function buildEmbedSrc() {
+        const host = location.hostname || 'localhost';
+        const params = new URLSearchParams({
+          parent: host,
+          muted: 'true'
+        });
+        const mode = getActiveEmbedMode();
+        const vodUrl = getLastVodUrl();
+        const videoId = mode === 'vod' ? parseTwitchVideoId(vodUrl) : null;
+        const videoTime = mode === 'vod' ? parseTwitchVideoTime(vodUrl) : null;
+
+        if (mode === 'vod' && videoId) {
+          params.set('video', `v${videoId}`);
+          if (videoTime) params.set('time', videoTime);
+        } else {
+          params.set('channel', state.channel || 'moonmoon');
+        }
+
+        return `https://player.twitch.tv/?${params.toString()}`;
+      }
+
+      function syncEmbed() {
+        const mode = getActiveEmbedMode();
+        const hasVod = Boolean(getLastVodUrl());
+        els.embedLiveTab.classList.toggle('active', mode === 'live');
+        els.embedVodTab.classList.toggle('active', mode === 'vod');
+        els.embedLiveTab.setAttribute('aria-selected', String(mode === 'live'));
+        els.embedVodTab.setAttribute('aria-selected', String(mode === 'vod'));
+        els.embedVodTab.disabled = !hasVod;
+        els.embedNote.textContent = getEmbedNote(mode);
+        const nextSrc = buildEmbedSrc();
+        if (els.twitchEmbed.src !== nextSrc) {
+          els.twitchEmbed.src = nextSrc;
+        }
+      }
+
+      function pathFromPoints(points) {
+        const safePoints = points.length >= 2 ? points : [numberOr(points[0], 0), numberOr(points[0], 0)];
+        const width = 720;
+        const height = 320;
+        const padX = 12;
+        const padTop = 8;
+        const padBottom = 28;
+        const usableW = width - padX * 2;
+        const usableH = height - padTop - padBottom;
+        const step = usableW / Math.max(1, safePoints.length - 1);
+        const xy = safePoints.map((value, i) => ({
+          x: padX + i * step,
+          y: padTop + ((100 - value) / 100) * usableH,
+        }));
+        let d = `M ${xy[0].x.toFixed(2)} ${xy[0].y.toFixed(2)}`;
+        for (let i = 0; i < xy.length - 1; i += 1) {
+          const current = xy[i];
+          const next = xy[i + 1];
+          const midX = (current.x + next.x) / 2;
+          d += ` C ${midX.toFixed(2)} ${current.y.toFixed(2)}, ${midX.toFixed(2)} ${next.y.toFixed(2)}, ${next.x.toFixed(2)} ${next.y.toFixed(2)}`;
+        }
+        return { d, last: xy[xy.length - 1] };
+      }
+
+      function renderGrid() {
+        els.chartGrid.innerHTML = '';
+        els.chartAxis.innerHTML = '';
+        const ticks = [100, 80, 60, 40, 20, 0];
+        ticks.forEach((tick) => {
+          const y = 8 + ((100 - tick) / 100) * (320 - 8 - 28);
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+          line.setAttribute('x1', '12');
+          line.setAttribute('x2', '708');
+          line.setAttribute('y1', y);
+          line.setAttribute('y2', y);
+          els.chartGrid.appendChild(line);
+
+          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+          text.setAttribute('x', '718');
+          text.setAttribute('y', y + 4);
+          text.setAttribute('text-anchor', 'end');
+          text.setAttribute('class', 'chart-axis-text');
+          text.textContent = `${tick}%`;
+          els.chartAxis.appendChild(text);
+        });
+      }
+
+      function render() {
+        const display = getDisplayState();
+        const isVodView = display.display_mode === 'vod';
+        const ocrScopeLabel = display.ocr_scope === 'full_frame' ? 'Full player frame' : 'Crop region';
+        const marketChance = getCurrentChance();
+        const marketDelta = getMarketDelta();
+        document.querySelectorAll('[data-range]').forEach((btn) => {
+          btn.classList.toggle('active', btn.dataset.range === paper.range);
+        });
+        const attemptDisplay = display.attempt ? `#${display.attempt}` : '—';
+        els.heroAttempt.textContent = attemptDisplay;
+        els.marketTitle.textContent = `MOONMOON to complete 'A New America' on Attempt ${attemptDisplay}`;
+        els.chanceValue.innerHTML = percentLabel(marketChance).replace('<', '&lt;');
+        els.deltaValue.textContent = `${marketDelta > 0 ? '▲' : marketDelta < 0 ? '▼' : '•'} ${Math.abs(marketDelta).toFixed(1)}`;
+        els.deltaValue.className = `delta ${marketDelta > 0 ? 'up' : marketDelta < 0 ? 'down' : 'flat'}`;
+        els.volumeValue.textContent = dollars(paper.volume);
+        els.liveState.textContent = isVodView ? 'LAST VOD' : (display.live ? 'LIVE' : 'OFFLINE');
+        els.liveState.className = `value ${isVodView ? 'status-test' : (display.live ? 'status-live' : 'status-offline')}`;
+        els.heroStatus.textContent = isVodView ? 'VOD' : (display.live ? 'Live' : 'Offline');
+        els.heroStatus.className = `stat-value ${isVodView ? 'test' : (display.live ? 'glow' : '')}`;
+        els.streamTitle.textContent = display.title || '—';
+        els.gameName.textContent = display.game_name || '—';
+        els.attemptValue.textContent = display.attempt ?? '—';
+        els.viewerCount.textContent = Number(display.viewer_count || 0).toLocaleString();
+        els.startedAt.textContent = fmtTime(display.started_at);
+        els.lastUpdate.textContent = fmtTime(display.last_update);
+        els.watcherStatus.textContent = display.watcher_status || (isVodView ? 'archive selected' : 'waiting for signal');
+        els.ocrConfidence.textContent = (display.ocr_confidence ?? 0).toFixed(2);
+        els.ocrScope.textContent = ocrScopeLabel;
+        els.ocrNotes.textContent = display.notes || (isVodView ? 'Last VOD selected.' : 'Listening for a clear omen.');
+        els.ocrTextBlock.textContent = display.ocr_text || (isVodView ? 'No archived omen text remembered yet.' : 'No omen yet.');
+        els.heroConfidence.textContent = (display.ocr_confidence ?? 0).toFixed(2);
+        renderWaterCounter();
+        syncEmbed();
+        renderPaperExchange();
+
+        const visiblePoints = getVisibleChanceHistory();
+        const series = getChartSeries(visiblePoints);
+        const { d, last } = pathFromPoints(series);
+        els.chartLine.setAttribute('d', d);
+        els.chartDot.setAttribute('cx', last.x);
+        els.chartDot.setAttribute('cy', last.y);
+        renderChartTimes(visiblePoints);
+      }
+
+      async function loadTracker() {
+        try {
+          const res = await fetch(`tracker.json?t=${Date.now()}`, { cache: 'no-store' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+          Object.assign(state, data);
+          rememberLastVodUrl(state.page_url);
+          rememberTrackerSnapshots(state);
+          render();
+        } catch (err) {
+          state.watcher_status = 'signal lost';
+          render();
+        }
+      }
+
+      async function loadArchivedVodSnapshot() {
+        for (const candidate of VOD_FEED_CANDIDATES) {
+          try {
+            const res = await fetch(`${candidate}?t=${Date.now()}`, { cache: 'no-store' });
+            if (!res.ok) continue;
+            const data = await res.json();
+            rememberVodSnapshot(data);
+            render();
+            return;
+          } catch {}
+        }
+      }
+
+      function initEmbed() {
+        syncEmbed();
+      }
+
+      document.querySelectorAll('[data-style]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('[data-style]').forEach((b) => b.classList.remove('active'));
+          btn.classList.add('active');
+          els.copypastaText.textContent = copypastas[btn.dataset.style];
+        });
+      });
+
+      document.querySelectorAll('[data-range]').forEach((btn) => {
+        if (btn.dataset.range === paper.range) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+
+        btn.addEventListener('click', () => {
+          paper.range = btn.dataset.range;
+          document.querySelectorAll('[data-range]').forEach((node) => node.classList.remove('active'));
+          btn.classList.add('active');
+          persistPaper();
+          render();
+        });
+      });
+
+      els.contractQty.addEventListener('input', () => render());
+      els.mooncoinQty.addEventListener('input', () => render());
+      els.buyYesBtn.addEventListener('click', () => executeContractTrade('yes', 'buy'));
+      els.buyNoBtn.addEventListener('click', () => executeContractTrade('no', 'buy'));
+      els.sellYesBtn.addEventListener('click', () => executeContractTrade('yes', 'sell'));
+      els.sellNoBtn.addEventListener('click', () => executeContractTrade('no', 'sell'));
+      els.buyMooncoinBtn.addEventListener('click', () => executeMooncoinTrade('buy'));
+      els.sellMooncoinBtn.addEventListener('click', () => executeMooncoinTrade('sell'));
+      els.topUpBtn.addEventListener('click', () => topUpCash());
+      els.resetPaperBtn.addEventListener('click', () => resetPaperAccount());
+
+      els.copyBtn.addEventListener('click', async () => {
+        try {
+          await navigator.clipboard.writeText(els.copypastaText.textContent);
+          els.copyBtn.textContent = 'Copied';
+          setTimeout(() => { els.copyBtn.textContent = 'Copy copypasta'; }, 1200);
+        } catch {
+          els.copyBtn.textContent = 'Clipboard blocked';
+          setTimeout(() => { els.copyBtn.textContent = 'Copy copypasta'; }, 1200);
+        }
+      });
+
+      els.refreshBtn.addEventListener('click', () => {
+        loadArchivedVodSnapshot();
+        loadTracker();
+      });
+      els.embedLiveTab.addEventListener('click', () => {
+        embedState.mode = 'live';
+        render();
+      });
+      els.embedVodTab.addEventListener('click', () => {
+        if (!getLastVodUrl()) return;
+        embedState.mode = 'vod';
+        render();
+      });
+      els.destinyBtn.addEventListener('click', () => {
+        els.copypastaText.textContent = copypastas.phone;
+        document.querySelectorAll('[data-style]').forEach((b) => b.classList.remove('active'));
+        document.querySelector('[data-style="phone"]').classList.add('active');
+        location.hash = '#destiny';
+      });
+      els.pulseBtn.addEventListener('click', () => {
+        document.body.animate(
+          [
+            { filter: 'saturate(1) brightness(1)' },
+            { filter: 'saturate(1.18) brightness(1.05)' },
+            { filter: 'saturate(1) brightness(1)' }
+          ],
+          { duration: 800, easing: 'ease-in-out' }
+        );
+      });
+
+      renderGrid();
+      embedState.lastVodUrl = loadStoredLastVodUrl();
+      rememberLastVodUrl(displaySnapshots.vod?.page_url);
+      syncWaterCounter();
+      initEmbed();
+      els.copypastaText.textContent = copypastas.max;
+      render();
+      loadArchivedVodSnapshot();
+      loadTracker();
+      setInterval(syncWaterCounter, WATER_TICK_MS);
+      setInterval(simulateMarketTick, MARKET_TICK_MS);
+      setInterval(loadArchivedVodSnapshot, 30000);
+      setInterval(loadTracker, 15000);
+    </script>
+  </body>
+</html>

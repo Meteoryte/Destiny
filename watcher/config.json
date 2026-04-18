@@ -1,0 +1,52 @@
+{
+  "channelName": "moonmoon",
+  "pageUrl": "https://www.twitch.tv/moonmoon",
+  "testVod": {
+    "enabled": false,
+    "pageUrl": "https://www.twitch.tv/videos/2750608960",
+    "startAt": "2h36m53s",
+    "title": "Moonmoon VOD test - A New America",
+    "gameName": "Ready or Not",
+    "viewerCount": 0
+  },
+  "pollIntervalMs": 60000,
+  "viewport": {
+    "width": 1600,
+    "height": 900
+  },
+  "ocr": {
+    "enabled": true,
+    "settleMs": 12000,
+    "scanMode": "full_frame",
+    "scale": 2,
+    "threshold": 165,
+    "psm": 11,
+    "whitelist": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#:- ",
+    "captureSelectors": [
+      "video",
+      "[data-a-target='video-player']",
+      ".video-player"
+    ],
+    "crop": {
+      "x": 27,
+      "y": 63,
+      "width": 36,
+      "height": 9
+    },
+    "dismissSelectors": [
+      "button:has-text('Start Watching')",
+      "button:has-text('Accept')",
+      "button[data-a-target='player-overlay-click-handler']"
+    ]
+  },
+  "output": {
+    "trackerPath": "tracker.json",
+    "screenshotPath": "latest-frame.png",
+    "cropPath": "latest-crop.png"
+  },
+  "site": {
+    "chance": 0,
+    "delta": 6.3,
+    "volume": 8073206
+  }
+}
