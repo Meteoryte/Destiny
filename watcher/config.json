@@ -20,7 +20,7 @@
     "settleMs": 12000,
     "scanMode": "crop",
     "pythonBin": "python3",
-    "timeoutMs": 90000,
+    "timeoutMs": 180000,
     "captureSelectors": [
       "video",
       "[data-a-target='video-player']",

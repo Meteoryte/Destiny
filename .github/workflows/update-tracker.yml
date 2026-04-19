@@ -39,6 +39,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Warm up PaddleOCR models
+        run: |
+          python -c "from paddleocr import PaddleOCR; PaddleOCR(use_angle_cls=False, lang='en', show_log=False); print('paddleocr ready')"
+
       - name: Install watcher dependencies
         working-directory: watcher
         run: |
