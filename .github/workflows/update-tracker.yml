@@ -59,4 +59,14 @@ jobs:
           git add tracker.json latest-crop.png latest-frame.png || true
           git diff --cached --quiet && exit 0
           git commit -m "Update tracker data"
-          git push
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "push succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "push attempt $attempt rejected, rebasing and retrying"
+            git pull --rebase origin main || { echo "rebase failed"; exit 1; }
+            sleep 3
+          done
+          echo "push failed after 5 attempts"
+          exit 1
