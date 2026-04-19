@@ -79,10 +79,11 @@ moonmoon_tracker_site/          ← REPO ROOT
     ├── .env.example            ← template for Twitch credentials
     ├── .env                    ← YOUR credentials (git-ignored, local only)
     ├── config.json             ← watcher configuration (OCR, polling, crop, etc.)
-    ├── watch.js                ← the Node.js watcher script
+    ├── watch.js                ← the Node.js watcher script (orchestrator)
+    ├── ocr.py                  ← PaddleOCR Python runner (called as subprocess)
+    ├── requirements.txt        ← Python dependencies for PaddleOCR
     ├── package.json            ← npm scripts and dependencies
-    ├── package-lock.json       ← lockfile
-    └── eng.traineddata         ← Tesseract English language model
+    └── package-lock.json       ← lockfile
 ```
 
 ---
@@ -115,9 +116,12 @@ moonmoon_tracker_site/          ← REPO ROOT
 
 ## The Watcher (Backend)
 
-### File: `watcher/watch.js`
+### File: `watcher/watch.js` (orchestrator) + `watcher/ocr.py` (OCR engine)
 
-**Dependencies:** `playwright`, `sharp`, `tesseract.js`
+**Node dependencies:** `playwright`, `sharp`
+**Python dependencies:** `paddleocr`, `paddlepaddle`, `Pillow`, `numpy` (see `watcher/requirements.txt`)
+
+**Why two languages:** Node drives the headless browser and Twitch API. Python owns OCR because PaddleOCR outperforms any JS-native OCR on stylized game fonts. `watch.js` shells out to `ocr.py` once per tick via `child_process.spawn`, passes the screenshot path + crop coords, and reads a single JSON line from stdout.
 
 ### Key Functions
 
@@ -129,7 +133,9 @@ moonmoon_tracker_site/          ← REPO ROOT
 | `readConfig()` | Reads `watcher/config.json` |
 | `getStreamSnapshot(config)` | Calls Twitch API for stream status. Returns user + stream data |
 | `getAppAccessToken()` | Gets OAuth token using client credentials flow |
-| `captureAndOcr(config)` | Launches headless browser, screenshots, crops, runs Tesseract |
+| `captureAndOcr(config)` | Launches headless browser, screenshots, then shells out to `ocr.py` for PaddleOCR |
+| `runPaddleOcr(...)` | Spawns `python ocr.py`, feeds it the screenshot + crop, parses stdout JSON |
+| `ocr.py: select_attempt()` | Picks the attempt number from PaddleOCR's candidate list (tiered match) |
 | `parseAttempt(text)` | Extracts attempt number from OCR text (e.g., `"ATTEMPT #468"` → `468`) |
 | `buildTracker()` | Assembles the final `tracker.json` object from all collected data |
 | `buildApiErrorTracker()` | Fallback tracker when Twitch API fails |
@@ -139,18 +145,20 @@ moonmoon_tracker_site/          ← REPO ROOT
 
 | Mode | Behavior |
 |------|----------|
-| `full_frame` | Scans the entire video player screenshot. **Currently active.** |
-| `crop` | Crops a specific rectangle from the screenshot before OCR |
+| `crop` | Crops the configured rectangle, runs PaddleOCR on just that region. **Currently active.** |
+| `full_frame` | Passes the whole screenshot to PaddleOCR (slower, more candidates, more noise) |
 
-### Attempt Parsing Logic (`parseAttempt`)
+### Attempt Parsing Logic
 
-The parser handles janky OCR by:
-1. Replacing common OCR errors: `O` → `0`, `I/l/|` → `1`
-2. Looking for patterns in priority order:
-   - `attempt #468` or `attempt 468`
-   - `#468`
-   - Any standalone number between 1 and 100,000
-3. Returns the first valid candidate
+Primary selection runs in `ocr.py:select_attempt()`, operating over PaddleOCR's per-line candidate list. It uses a tiered match:
+
+1. **Tier 1:** `ATTEMPT` (with allowed OCR garble like `H`, `A`, `.`, `:`) followed by 1-5 digits, confidence ≥ 50.
+2. **Tier 2:** `#` or `N` followed by 1-5 digits, confidence ≥ 50.
+3. **Tier 3:** Bare 1-5 digit line, confidence ≥ 70 (stricter — HUD numbers live here).
+
+Within a tier, highest-confidence candidate wins. Returned confidence is the winning candidate's confidence (0-100), not an average.
+
+`watch.js:parseAttempt` still exists as a fallback over the joined raw text, so if Python's selection returns `null` but the raw text happens to contain a usable pattern, we can still rescue it.
 
 ### Error Handling
 
@@ -290,22 +298,21 @@ Go to Actions tab → "Update tracker" → "Run workflow" → select `main` bran
 
   "ocr": {
     "enabled": true,                    // master OCR toggle
+    "engine": "paddleocr",              // informational, only paddleocr is wired right now
     "settleMs": 12000,                  // wait time (ms) after page load before screenshot
-    "scanMode": "full_frame",           // "full_frame" or "crop"
-    "scale": 2,                         // upscale factor for crop preprocessing
-    "threshold": 165,                   // binarization threshold (0-255)
-    "psm": 11,                          // Tesseract page segmentation mode
-    "whitelist": "A-Z a-z 0-9 # : - ", // character whitelist for crop mode
+    "scanMode": "crop",                 // "crop" (recommended) or "full_frame"
+    "pythonBin": "python3",             // python executable used to run ocr.py
+    "timeoutMs": 90000,                 // kill the OCR subprocess after this long
     "captureSelectors": [               // CSS selectors to try for video element
       "video",
       "[data-a-target='video-player']",
       ".video-player"
     ],
-    "crop": {                           // crop region as % of viewport (only used in crop mode)
-      "x": 27,
-      "y": 63,
-      "width": 36,
-      "height": 9
+    "crop": {                           // crop region as % of video element
+      "x": 1,                           // targets the bottom-left "ATTEMPT #..." overlay
+      "y": 77,
+      "width": 28,
+      "height": 15
     },
     "dismissSelectors": [               // buttons to click to dismiss overlays
       "button:has-text('Start Watching')",
@@ -362,9 +369,9 @@ The watcher uses the **Client Credentials** OAuth flow (server-to-server, no use
 
 ## OCR Tuning Guide
 
-### Current setup: Full Frame mode
+### Current setup: PaddleOCR + targeted crop
 
-The watcher screenshots the entire video player and runs OCR across the whole image. Tesseract looks for text like `ATTEMPT #468` anywhere in the frame.
+The watcher screenshots the `<video>` element, crops the bottom-left chapter-card region (`x:1% y:77% w:28% h:15%`), and runs PaddleOCR on just that region. PaddleOCR returns a ranked list of text detections with per-line confidence; `select_attempt` in `ocr.py` picks the best "attempt number" candidate.
 
 ### When OCR fails or reads wrong:
 
@@ -375,44 +382,35 @@ The watcher screenshots the entire video player and runs OCR across the whole im
 - The page didn't fully load (increase `settleMs`)
 - Twitch showed an overlay that wasn't dismissed
 
-### Switching to Crop mode:
+### Adjusting the crop box:
 
-If full_frame is too noisy, switch to targeted crop:
+If the overlay layout changes (new theme, repositioned chapter card):
 
-1. Edit `watcher/config.json`:
-   ```json
-   "scanMode": "crop"
-   ```
-2. Adjust the `crop` box to target where the attempt counter appears:
-   ```json
-   "crop": {
-     "x": 27,      // % from left edge
-     "y": 63,      // % from top edge
-     "width": 36,  // % of total width
-     "height": 9   // % of total height
-   }
-   ```
-3. Run once locally: `node watcher/watch.js --once`
-4. Check `latest-crop.png` to see what Tesseract is reading
-5. Adjust crop values until the attempt text is cleanly captured
+1. Run `node watcher/watch.js --once`
+2. Open `latest-crop.png` — does it contain the `ATTEMPT #NNN` text and nothing else useful?
+3. Edit `watcher/config.json` → `ocr.crop` percentages and re-run until the crop is clean.
 
 ### Tuning parameters:
 
 | Parameter | Effect | When to change |
 |-----------|--------|----------------|
-| `settleMs` | How long to wait after page load | Increase if page loads slowly (12000 = 12s) |
-| `threshold` | Binarization cutoff (0-255) | Lower = more text detected, higher = cleaner but may miss faint text |
-| `scale` | Upscale factor for preprocessing | Higher = better OCR on small text, but slower |
-| `psm` | Tesseract page segmentation mode | `7` = single text line (crop), `11` = sparse text (full_frame) |
+| `settleMs` | How long to wait after page load | Increase if the video element hasn't painted yet (12000 = 12s) |
+| `scanMode` | `crop` vs `full_frame` | Stay on `crop`; only flip to `full_frame` while hunting a new crop region |
+| `timeoutMs` | Max wait for the Python OCR subprocess | Increase if CI is slow or models are cold |
+| `pythonBin` | Which Python executable to spawn | Set if `python3` is not on PATH (locally this might be `python`) |
 | `dismissSelectors` | Overlay buttons to auto-click | Add new selectors if Twitch adds new overlays |
+
+### Tuning the attempt selector:
+
+If PaddleOCR keeps picking the wrong text (e.g. the ammo counter wins over the chapter card), edit `select_attempt` in `watcher/ocr.py`. The confidence floors (`50` on tier 1-2, `70` on tier 3) are the first knobs to turn.
 
 ### Debug workflow:
 
-1. Run `node watcher/watch.js --once`
+1. Run `node watcher/watch.js --once` (set `PYTHON_BIN=python` on Windows if needed)
 2. Open `latest-frame.png` — is the stream visible?
-3. Open `latest-crop.png` — is the attempt text captured?
-4. Check `tracker.json` → `ocr_text` — what did Tesseract read?
-5. Check `ocr_confidence` — above 50 is decent, above 70 is good
+3. Open `latest-crop.png` — does it contain the attempt chapter card?
+4. Check `tracker.json` → `ocr_text` — PaddleOCR's candidate lines joined by newlines
+5. Check `ocr_confidence` — this is the confidence of the WINNING candidate (0-100); above 85 is clean, above 70 is decent, below 50 is suspect
 
 ---
 

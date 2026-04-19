@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 const fs = require('fs/promises');
 const path = require('path');
+const { spawn } = require('child_process');
 const { chromium } = require('playwright');
 const sharp = require('sharp');
-const { createWorker } = require('tesseract.js');
 
 const rootDir = path.resolve(__dirname, '..');
 const args = new Set(process.argv.slice(2));
@@ -93,6 +93,38 @@ function withStartAt(pageUrl, startAt) {
 
 function getOcrScanMode(config) {
   return config.ocr?.scanMode === 'full_frame' ? 'full_frame' : 'crop';
+}
+
+function runPaddleOcr({ imagePath, cropPct, cropOutPath, pythonBin, scriptPath, timeoutMs }) {
+  return new Promise((resolve, reject) => {
+    const args = [scriptPath, '--image', imagePath];
+    if (cropPct) args.push('--crop-json', JSON.stringify(cropPct));
+    if (cropOutPath) args.push('--crop-out', cropOutPath);
+
+    const proc = spawn(pythonBin, args, { windowsHide: true });
+    let stdout = '';
+    let stderr = '';
+    const timer = setTimeout(() => {
+      proc.kill('SIGKILL');
+      reject(new Error(`paddleocr timed out after ${timeoutMs}ms`));
+    }, timeoutMs);
+
+    proc.stdout.on('data', (d) => { stdout += d.toString(); });
+    proc.stderr.on('data', (d) => { stderr += d.toString(); });
+    proc.on('error', (err) => { clearTimeout(timer); reject(err); });
+    proc.on('close', (code) => {
+      clearTimeout(timer);
+      if (code !== 0) {
+        return reject(new Error(`paddleocr exited ${code}: ${stderr.trim().slice(-500)}`));
+      }
+      try {
+        const lastLine = stdout.trim().split(/\r?\n/).filter(Boolean).pop() || '{}';
+        resolve(JSON.parse(lastLine));
+      } catch (err) {
+        reject(new Error(`paddleocr returned invalid JSON: ${err.message}`));
+      }
+    });
+  });
 }
 
 function getTestVod(config) {
@@ -248,69 +280,31 @@ async function captureAndOcr(config, options = {}) {
       await page.screenshot({ path: screenshotPath, fullPage: false });
     }
 
-    const meta = await sharp(screenshotPath).metadata();
-    let ocrSourcePath = screenshotPath;
+    const cropPct = scanMode === 'full_frame' ? null : config.ocr.crop;
+    const scriptPath = path.resolve(__dirname, 'ocr.py');
+    const pythonBin = config.ocr.pythonBin || process.env.PYTHON_BIN || 'python3';
+    const timeoutMs = config.ocr.timeoutMs || 90000;
 
-    if (scanMode === 'full_frame') {
-      await sharp(screenshotPath).png().toFile(cropPath);
-    } else {
-      let image = sharp(screenshotPath);
-      const crop = config.ocr.crop;
-      const left = Math.round((crop.x / 100) * meta.width);
-      const top = Math.round((crop.y / 100) * meta.height);
-      const width = Math.max(1, Math.round((crop.width / 100) * meta.width));
-      const height = Math.max(1, Math.round((crop.height / 100) * meta.height));
+    const result = await runPaddleOcr({
+      imagePath: screenshotPath,
+      cropPct,
+      cropOutPath: cropPath,
+      pythonBin,
+      scriptPath,
+      timeoutMs,
+    });
 
-      image = image.extract({
-        left: clamp(left, 0, meta.width - 1),
-        top: clamp(top, 0, meta.height - 1),
-        width: clamp(width, 1, meta.width - clamp(left, 0, meta.width - 1)),
-        height: clamp(height, 1, meta.height - clamp(top, 0, meta.height - 1)),
-      });
+    const attemptFromPython = Number.isFinite(result.attempt) ? result.attempt : null;
+    const attempt = attemptFromPython ?? parseAttempt(result.rawText || '');
 
-      image = image
-        .grayscale()
-        .normalize()
-        .resize({
-          width: Math.max(width * (config.ocr.scale || 2), width),
-          kernel: 'nearest',
-        });
-
-      if (typeof config.ocr.threshold === 'number') {
-        image = image.threshold(config.ocr.threshold);
-      }
-
-      await image.png().toFile(cropPath);
-      ocrSourcePath = cropPath;
-    }
-
-    const worker = await createWorker('eng');
-    try {
-      const workerParams = {
-        tessedit_pageseg_mode: String(config.ocr.psm ?? (scanMode === 'full_frame' ? 11 : 7)),
-      };
-
-      if (scanMode === 'full_frame') {
-        workerParams.preserve_interword_spaces = '1';
-      } else {
-        workerParams.tessedit_char_whitelist = config.ocr.whitelist || 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#:- ';
-      }
-
-      await worker.setParameters(workerParams);
-      const result = await worker.recognize(ocrSourcePath);
-      const rawText = result.data.text || '';
-      const confidence = Number(result.data.confidence || 0);
-      const attempt = parseAttempt(rawText);
-      return {
-        attempt,
-        confidence,
-        rawText: rawText.trim(),
-        cropSaved: true,
-        scanMode,
-      };
-    } finally {
-      await worker.terminate();
-    }
+    return {
+      attempt,
+      confidence: Number(result.confidence || 0),
+      rawText: String(result.rawText || '').trim(),
+      cropSaved: Boolean(result.cropApplied),
+      scanMode,
+      candidates: result.candidates || [],
+    };
   } finally {
     await browser.close();
   }

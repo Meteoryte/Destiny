@@ -16,22 +16,21 @@
   },
   "ocr": {
     "enabled": true,
+    "engine": "paddleocr",
     "settleMs": 12000,
-    "scanMode": "full_frame",
-    "scale": 2,
-    "threshold": 165,
-    "psm": 11,
-    "whitelist": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789#:- ",
+    "scanMode": "crop",
+    "pythonBin": "python3",
+    "timeoutMs": 90000,
     "captureSelectors": [
       "video",
       "[data-a-target='video-player']",
       ".video-player"
     ],
     "crop": {
-      "x": 27,
-      "y": 63,
-      "width": 36,
-      "height": 9
+      "x": 1,
+      "y": 77,
+      "width": 28,
+      "height": 15
     },
     "dismissSelectors": [
       "button:has-text('Start Watching')",
