@@ -390,9 +390,132 @@
         padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.03); color: #bfcadf; border: 1px solid rgba(255,255,255,0.05);
       }
 
+      /* Sticky ticker bar — always visible below nav */
+      .ticker-bar {
+        position: sticky; top: 68px; z-index: 45;
+        background: linear-gradient(180deg, rgba(9,12,20,0.95), rgba(7,10,16,0.92));
+        border-bottom: 1px solid rgba(255,255,255,0.06);
+        backdrop-filter: blur(18px);
+      }
+      .ticker-inner {
+        display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0; padding: 10px 0;
+      }
+      .ticker-cell {
+        padding: 6px 16px;
+        border-right: 1px solid rgba(255,255,255,0.05);
+        min-width: 0;
+      }
+      .ticker-cell:last-child { border-right: none; }
+      .ticker-label {
+        color: var(--muted); font-size: 10px; font-weight: 800;
+        letter-spacing: 0.14em; text-transform: uppercase;
+      }
+      .ticker-value {
+        margin-top: 2px; font-size: clamp(18px, 2.2vw, 22px); font-weight: 800;
+        letter-spacing: -0.03em; font-variant-numeric: tabular-nums;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      }
+      .ticker-value.glow { color: #97ffe0; text-shadow: 0 0 18px rgba(151,255,224,0.24); }
+      .ticker-value.dim { color: var(--muted); font-weight: 700; }
+      .ticker-value.up { color: var(--green); }
+      .ticker-value.down { color: var(--red); }
+      .ticker-live-dot {
+        display: inline-block; width: 8px; height: 8px; border-radius: 999px;
+        background: var(--green); box-shadow: 0 0 12px var(--green);
+        margin-right: 8px; vertical-align: middle;
+      }
+      .ticker-live-dot.off { background: #4a5368; box-shadow: none; }
+
+      /* Command center — the working fold */
+      .command { padding: 24px 0 22px; }
+      .command-grid {
+        display: grid; grid-template-columns: 1.3fr 1fr; gap: 22px; align-items: stretch;
+      }
+      .watch-col { display: grid; gap: 18px; }
+      .bet-panel {
+        padding: 22px;
+        background: linear-gradient(180deg, rgba(18,24,36,0.95), rgba(10,14,21,0.96));
+        border: 1px solid rgba(151,255,224,0.14);
+        box-shadow: 0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.04);
+      }
+      .bet-panel h3 {
+        margin: 8px 0 6px; font-size: 26px; letter-spacing: -0.04em;
+      }
+      .bet-panel .bet-sub {
+        margin: 0 0 16px; color: #bfcadf; font-size: 14px; line-height: 1.6;
+      }
+      .bet-big-actions {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px;
+      }
+      .bet-big-btn {
+        border: 1px solid rgba(255,255,255,0.08); border-radius: 18px;
+        padding: 18px 14px; font: inherit; font-weight: 800; color: #fff;
+        cursor: pointer; transition: 160ms ease; text-align: left;
+      }
+      .bet-big-btn:hover { transform: translateY(-1px); }
+      .bet-big-btn .bet-side {
+        display: block; font-size: 12px; letter-spacing: 0.14em;
+        text-transform: uppercase; color: rgba(255,255,255,0.7);
+      }
+      .bet-big-btn .bet-price {
+        display: block; margin-top: 6px; font-size: 28px; letter-spacing: -0.04em;
+        font-variant-numeric: tabular-nums;
+      }
+      .bet-big-btn .bet-action {
+        display: block; margin-top: 6px; font-size: 13px; color: rgba(255,255,255,0.85);
+      }
+      .bet-big-btn.yes { background: linear-gradient(135deg, rgba(25,215,158,0.28), rgba(25,215,158,0.12)); border-color: rgba(25,215,158,0.3); }
+      .bet-big-btn.no { background: linear-gradient(135deg, rgba(255,58,58,0.26), rgba(255,58,58,0.1)); border-color: rgba(255,58,58,0.28); }
+      .bet-sub-actions {
+        display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;
+      }
+      .bet-inline {
+        display: flex; justify-content: space-between; align-items: center; gap: 12px;
+        padding: 12px 14px; border-radius: 14px;
+        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+        margin-top: 14px; font-size: 13px;
+      }
+      .bet-inline-label { color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; font-size: 11px; font-weight: 800; }
+      .bet-inline-value { font-weight: 800; font-variant-numeric: tabular-nums; }
+      .bet-qty-row {
+        display: flex; align-items: center; gap: 10px; margin-top: 14px;
+      }
+      .bet-qty-row .ticket-label { flex-shrink: 0; }
+      .bet-qty-row .ticket-input { flex: 1; }
+
+      /* Positions strip — compact horizontal row */
+      .positions-strip {
+        display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px; margin-bottom: 18px;
+      }
+      .pos-card {
+        min-width: 0; padding: 14px 16px; border-radius: 16px;
+        background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+      }
+      .pos-label {
+        color: var(--muted); font-size: 10px; font-weight: 800;
+        letter-spacing: 0.14em; text-transform: uppercase;
+      }
+      .pos-value {
+        margin-top: 6px; font-size: 20px; font-weight: 800; letter-spacing: -0.03em;
+        font-variant-numeric: tabular-nums; overflow-wrap: anywhere;
+      }
+      .pos-sub {
+        margin-top: 4px; color: #97a3b8; font-size: 12px; overflow-wrap: anywhere;
+      }
+      .positions-actions {
+        display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px;
+      }
+
       @media (max-width: 1080px) {
-        .hero-grid, .tracker-grid, .exchange-grid, .pillars-grid, .copypasta-grid, .quote-grid { grid-template-columns: 1fr; }
+        .hero-grid, .tracker-grid, .exchange-grid, .pillars-grid, .copypasta-grid, .quote-grid,
+        .command-grid { grid-template-columns: 1fr; }
         .account-grid, .desk-grid { grid-template-columns: 1fr 1fr; }
+        .positions-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .ticker-inner { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .ticker-cell:nth-child(3) { border-right: none; }
+        .ticker-cell:nth-child(n+4) { border-top: 1px solid rgba(255,255,255,0.05); }
       }
       @media (max-width: 760px) {
         .container { width: min(100vw - 20px, 1200px); }
@@ -408,6 +531,11 @@
         .nav-links::-webkit-scrollbar { display: none; }
         .nav-links a { flex-shrink: 0; }
         .hero-grid { display: flex; flex-direction: column-reverse; gap: 20px; }
+        .positions-strip { grid-template-columns: 1fr 1fr; }
+        .ticker-inner { grid-template-columns: 1fr 1fr; }
+        .ticker-cell { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .ticker-cell:nth-child(even) { border-right: none; }
+        .ticker-bar { top: 62px; }
       }
     </style>
   </head>
@@ -431,52 +559,235 @@
       </div>
     </nav>
 
+    <div class="ticker-bar">
+      <div class="container ticker-inner">
+        <div class="ticker-cell">
+          <div class="ticker-label">Attempt</div>
+          <div class="ticker-value" id="heroAttempt">#468</div>
+        </div>
+        <div class="ticker-cell">
+          <div class="ticker-label">Chance</div>
+          <div class="ticker-value glow" id="tickerChance">&lt;1%</div>
+        </div>
+        <div class="ticker-cell">
+          <div class="ticker-label">24h delta</div>
+          <div class="ticker-value down" id="tickerDelta">▼ 6.3</div>
+        </div>
+        <div class="ticker-cell">
+          <div class="ticker-label">Stream</div>
+          <div class="ticker-value glow" id="heroStatus"><span class="ticker-live-dot"></span>Live</div>
+        </div>
+        <div class="ticker-cell">
+          <div class="ticker-label">Viewers</div>
+          <div class="ticker-value" id="tickerViewers">0</div>
+        </div>
+      </div>
+    </div>
+
     <main id="top">
       <section class="hero">
-        <div class="container hero-grid">
+        <div class="container">
           <div class="panel hero-copy">
             <div class="eyebrow"><span class="dot"></span> Real-time-ish with catastrophic confidence</div>
-            <h1><span class="gradient">This is the one.</span><br />Until the next reset.</h1>
+            <h1><span class="gradient">This is the one.</span> <span style="opacity:0.6">Until the next reset.</span></h1>
             <p class="lead">
-              A full vibe-coded shrine to moonmoon, <strong>A New America</strong>, "real" market odds, impossible patience,
-              Oba Doba witness protection, and the spiritually unstable belief that the phone at the end of the level is not ringing — destiny is.
+              Bet the phone. Watch the stream. Pretend the odds mean something.
             </p>
-            <div class="cta-row">
-              <a class="cta" href="#tracker">Open live tracker →</a>
-              <a class="secondary" href="#copypasta">Load psychosis mode</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="command" id="command">
+        <div class="container">
+          <div class="command-grid">
+            <div class="watch-col">
+              <div class="panel embed-shell">
+                <div class="embed-top">
+                  <div class="mini-label">Now watching</div>
+                  <div class="embed-tabs" role="tablist" aria-label="Twitch source">
+                    <button class="embed-tab active" id="embedLiveTab" type="button" role="tab" aria-selected="true">Live</button>
+                    <button class="embed-tab" id="embedVodTab" type="button" role="tab" aria-selected="false">Last VOD</button>
+                  </div>
+                </div>
+                <iframe id="twitchEmbed" class="embed-frame" allowfullscreen title="Moonmoon Twitch stream"></iframe>
+                <div class="embed-note" id="embedNote">
+                  Live channel pressure, chat chaos, and the current omen if the stream is up.
+                </div>
+              </div>
+
+              <div class="panel market-shell">
+                <div class="market-card">
+                  <div class="market-top">
+                    <div class="market-title" id="marketTitle">MOONMOON to complete 'A New America' on Attempt #468</div>
+                    <div class="market-icons">
+                      <div class="icon-pill">🗓️</div>
+                      <div class="icon-pill">💬</div>
+                      <div class="icon-pill">⤴️</div>
+                      <div class="icon-pill">⤓</div>
+                    </div>
+                  </div>
+
+                  <div class="market-meta">
+                    <div class="big-chance">
+                      <div class="big-chance-value" id="chanceValue">&lt;1%</div>
+                      <div class="chance-word">chance</div>
+                      <div class="delta" id="deltaValue">▼ 6.3</div>
+                    </div>
+                    <div class="brand-mark">Kalshi</div>
+                  </div>
+
+                  <div class="chart-wrap">
+                    <svg viewBox="0 0 720 320" width="100%" height="320" aria-label="market chart">
+                      <g class="chart-grid" id="chartGrid"></g>
+                      <g id="chartAxis"></g>
+                      <path class="chart-line" id="chartLine"></path>
+                      <circle class="chart-dot" id="chartDot" r="7"></circle>
+                    </svg>
+                  </div>
+
+                  <div class="chart-times" id="chartTimes"></div>
+
+                  <div class="market-footer">
+                    <div class="volume" id="volumeValue">$8,073,206 vol</div>
+                    <div class="range-group">
+                      <button class="range-btn active" type="button" data-range="6H">6H</button>
+                      <button class="range-btn" type="button" data-range="1D">1D</button>
+                      <button class="range-btn" type="button" data-range="1W">1W</button>
+                      <button class="range-btn" type="button" data-range="1M">1M</button>
+                      <button class="range-btn" type="button" data-range="ALL">ALL</button>
+                    </div>
+                  </div>
+
+                  <div class="tiny-note">kalshi.tools</div>
+
+                  <svg class="oba" viewBox="0 0 104 118" aria-label="Oba Doba">
+                    <rect width="104" height="118" fill="#12253b"></rect>
+                    <path d="M0 0h79c10 0 25 7 25 28v56c0 19-15 34-34 34H0Z" fill="#14999e"></path>
+                    <ellipse cx="27" cy="31" rx="23" ry="20" fill="#fff" stroke="#000" stroke-width="3"></ellipse>
+                    <ellipse cx="74" cy="35" rx="23" ry="21" fill="#fff" stroke="#000" stroke-width="3"></ellipse>
+                    <circle cx="21" cy="28" r="10" fill="#000"></circle>
+                    <circle cx="69" cy="33" r="10" fill="#000"></circle>
+                    <circle cx="17" cy="23" r="3" fill="#fff"></circle>
+                    <circle cx="65" cy="29" r="3" fill="#fff"></circle>
+                    <path d="M15 77c16 15 52 18 72 4" fill="none" stroke="#000" stroke-width="4.5" stroke-linecap="round"></path>
+                    <path d="M95 101l4 12" stroke="#5e3513" stroke-width="4" stroke-linecap="round"></path>
+                    <path d="M92 113l9-2" stroke="#98a4b8" stroke-width="2" stroke-linecap="round"></path>
+                  </svg>
+                </div>
+              </div>
             </div>
-            <div class="hero-stats">
-              <div class="stat-card featured">
-                <div class="stat-label">Current attempt</div>
-                <div class="stat-value" id="heroAttempt">#468</div>
+
+            <div class="panel bet-panel" id="exchange">
+              <div class="mini-label">"Real" Kalshi desk</div>
+              <h3>Bet the phone.</h3>
+              <p class="bet-sub">Contracts in cents. Browser-local positions. Nothing settles except your reputation.</p>
+
+              <div class="bet-big-actions">
+                <button class="bet-big-btn yes" type="button" id="buyYesBtn">
+                  <span class="bet-side">YES · completes</span>
+                  <span class="bet-price" id="yesAsk">18c</span>
+                  <span class="bet-action">Buy YES →</span>
+                </button>
+                <button class="bet-big-btn no" type="button" id="buyNoBtn">
+                  <span class="bet-side">NO · resets</span>
+                  <span class="bet-price" id="noAsk">84c</span>
+                  <span class="bet-action">Buy NO →</span>
+                </button>
               </div>
-              <div class="stat-card">
-                <div class="stat-label">Stream</div>
-                <div class="stat-value glow" id="heroStatus">Live</div>
+
+              <div class="bet-qty-row">
+                <label class="ticket-label" for="contractQty">Contracts</label>
+                <input class="ticket-input" id="contractQty" type="number" min="1" step="1" value="10" />
               </div>
-              <div class="stat-card">
-                <div class="stat-label">OCR confidence</div>
-                <div class="stat-value" id="heroConfidence">0.00</div>
+
+              <div class="ticket-summary">
+                <div class="summary-row">
+                  <span>YES estimate</span>
+                  <strong id="estimatedYesCost">$1.80</strong>
+                </div>
+                <div class="summary-row">
+                  <span>NO estimate</span>
+                  <strong id="estimatedNoCost">$8.40</strong>
+                </div>
               </div>
-              <div class="stat-card">
-                <div class="stat-label">AI water consumed</div>
-                <div class="stat-value compact" id="heroWater">98,772,441 bottles</div>
+
+              <div class="bet-sub-actions">
+                <button class="trade-btn ghost" type="button" id="sellYesBtn">Sell YES</button>
+                <button class="trade-btn ghost" type="button" id="sellNoBtn">Sell NO</button>
+              </div>
+
+              <div class="bet-inline">
+                <div>
+                  <div class="bet-inline-label">Cash</div>
+                  <div class="bet-inline-value" id="paperCash">$10,000.00</div>
+                </div>
+                <div>
+                  <div class="bet-inline-label">Portfolio</div>
+                  <div class="bet-inline-value" id="portfolioValue">$10,000.00</div>
+                </div>
+                <div>
+                  <div class="bet-inline-label">P/L</div>
+                  <div class="bet-inline-value" id="paperPnl">$0.00</div>
+                </div>
+              </div>
+
+              <div style="display:none">
+                <span id="yesBid">16c</span>
+                <span id="yesMark">17c</span>
+                <span id="noBid">82c</span>
+                <span id="noMark">83c</span>
+                <span id="buyingPower"></span>
               </div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div class="panel embed-shell">
-            <div class="embed-top">
-              <div class="mini-label">Twitch switcher</div>
-              <div class="embed-tabs" role="tablist" aria-label="Twitch source">
-                <button class="embed-tab active" id="embedLiveTab" type="button" role="tab" aria-selected="true">Live</button>
-                <button class="embed-tab" id="embedVodTab" type="button" role="tab" aria-selected="false">Last VOD</button>
-              </div>
+      <section class="section" id="positions">
+        <div class="container">
+          <div class="section-head">
+            <h2>Positions &amp; tape.</h2>
+            <p>Your current book and the live fills feeding into it.</p>
+          </div>
+
+          <div class="positions-strip">
+            <div class="pos-card">
+              <div class="pos-label">YES position</div>
+              <div class="pos-value" id="yesPosition">0 sh</div>
+              <div class="pos-sub" id="yesAvgPrice">Avg $0.00</div>
             </div>
-            <iframe id="twitchEmbed" class="embed-frame" allowfullscreen></iframe>
-            <div class="embed-note" id="embedNote">
-              Live channel pressure, chat chaos, and the current omen if the stream is up.
+            <div class="pos-card">
+              <div class="pos-label">NO position</div>
+              <div class="pos-value" id="noPosition">0 sh</div>
+              <div class="pos-sub" id="noAvgPrice">Avg $0.00</div>
             </div>
+            <div class="pos-card">
+              <div class="pos-label">Mooncoin wallet</div>
+              <div class="pos-value" id="mooncoinWallet">0 MC</div>
+              <div class="pos-sub" id="mooncoinCostBasis">Basis $0.00</div>
+            </div>
+            <div class="pos-card">
+              <div class="pos-label">Mooncoin price</div>
+              <div class="pos-value" id="mooncoinPrice">$0.84</div>
+              <div class="pos-sub">24h <span id="mooncoinDelta">+0.00%</span></div>
+            </div>
+            <div class="pos-card">
+              <div class="pos-label">Wallet value</div>
+              <div class="pos-value" id="mooncoinWalletValue">$0.00</div>
+              <div class="pos-sub">Order <span id="mooncoinOrderValue">$21.00</span></div>
+            </div>
+          </div>
+
+          <div class="positions-actions">
+            <button class="chip active" type="button" id="topUpBtn">Add "real" $2,500</button>
+            <button class="chip" type="button" id="resetPaperBtn">Reset the ledger</button>
+          </div>
+
+          <div class="panel blotter-shell">
+            <div class="mini-label">"Real" tape</div>
+            <h3>Live "real" fills.</h3>
+            <p>"Real" prints, "real" positions, and browser persistence sturdy enough to preserve your quote-unquote fortune between reloads.</p>
+            <div class="blotter-list" id="tradeLog"></div>
           </div>
         </div>
       </section>
@@ -484,242 +795,60 @@
       <section class="section" id="tracker">
         <div class="container">
           <div class="section-head">
-            <h2>Live tracker.</h2>
-            <p>
-              Live odds, fresh attempt reads, crowd temperature, and whatever signal the timeline is willing to give us.
-            </p>
+            <h2>Signal detail.</h2>
+            <p>OCR reads, stream meta, and whatever the timeline last coughed up.</p>
           </div>
 
-          <div class="tracker-grid">
-            <div class="panel market-shell">
-              <div class="market-card">
-                <div class="market-top">
-                  <div class="market-title" id="marketTitle">MOONMOON to complete 'A New America' on Attempt #468</div>
-                  <div class="market-icons">
-                    <div class="icon-pill">🗓️</div>
-                    <div class="icon-pill">💬</div>
-                    <div class="icon-pill">⤴️</div>
-                    <div class="icon-pill">⤓</div>
-                  </div>
-                </div>
-
-                <div class="market-meta">
-                  <div class="big-chance">
-                    <div class="big-chance-value" id="chanceValue">&lt;1%</div>
-                    <div class="chance-word">chance</div>
-                    <div class="delta" id="deltaValue">▼ 6.3</div>
-                  </div>
-                  <div class="brand-mark">Kalshi</div>
-                </div>
-
-                <div class="chart-wrap">
-                  <svg viewBox="0 0 720 320" width="100%" height="320" aria-label="market chart">
-                    <g class="chart-grid" id="chartGrid"></g>
-                    <g id="chartAxis"></g>
-                    <path class="chart-line" id="chartLine"></path>
-                    <circle class="chart-dot" id="chartDot" r="7"></circle>
-                  </svg>
-                </div>
-
-                <div class="chart-times" id="chartTimes"></div>
-
-                <div class="market-footer">
-                  <div class="volume" id="volumeValue">$8,073,206 vol</div>
-                  <div class="range-group">
-                    <button class="range-btn active" data-range="6H">6H</button>
-                    <button class="range-btn" data-range="1D">1D</button>
-                    <button class="range-btn" data-range="1W">1W</button>
-                    <button class="range-btn" data-range="1M">1M</button>
-                    <button class="range-btn" data-range="ALL">ALL</button>
-                  </div>
-                </div>
-
-                <div class="tiny-note">kalshi.tools</div>
-
-                <svg class="oba" viewBox="0 0 104 118" aria-label="Oba Doba">
-                  <rect width="104" height="118" fill="#12253b"></rect>
-                  <path d="M0 0h79c10 0 25 7 25 28v56c0 19-15 34-34 34H0Z" fill="#14999e"></path>
-                  <ellipse cx="27" cy="31" rx="23" ry="20" fill="#fff" stroke="#000" stroke-width="3"></ellipse>
-                  <ellipse cx="74" cy="35" rx="23" ry="21" fill="#fff" stroke="#000" stroke-width="3"></ellipse>
-                  <circle cx="21" cy="28" r="10" fill="#000"></circle>
-                  <circle cx="69" cy="33" r="10" fill="#000"></circle>
-                  <circle cx="17" cy="23" r="3" fill="#fff"></circle>
-                  <circle cx="65" cy="29" r="3" fill="#fff"></circle>
-                  <path d="M15 77c16 15 52 18 72 4" fill="none" stroke="#000" stroke-width="4.5" stroke-linecap="round"></path>
-                  <path d="M95 101l4 12" stroke="#5e3513" stroke-width="4" stroke-linecap="round"></path>
-                  <path d="M92 113l9-2" stroke="#98a4b8" stroke-width="2" stroke-linecap="round"></path>
-                </svg>
+          <div class="panel info-shell">
+            <div class="info-grid">
+              <div class="info-card">
+                <div class="mini">Live state</div>
+                <div class="value status-live" id="liveState">LIVE</div>
+                <div class="sub" id="streamTitle">Ready or Not — A New America</div>
               </div>
-            </div>
-
-            <div class="panel info-shell">
-              <div class="info-grid">
-                <div class="info-card">
-                  <div class="mini">Live state</div>
-                  <div class="value status-live" id="liveState">LIVE</div>
-                  <div class="sub" id="streamTitle">Ready or Not — A New America</div>
-                </div>
-                <div class="info-card">
-                  <div class="mini">Game</div>
-                  <div class="value" id="gameName">Ready or Not</div>
-                  <div class="sub">Current battlefield under examination.</div>
-                </div>
-                <div class="info-card">
-                  <div class="mini">Attempt read</div>
-                  <div class="value" id="attemptValue">468</div>
-                  <div class="sub">Signal confidence: <span id="ocrConfidence">0.00</span></div>
-                </div>
-                <div class="info-card">
-                  <div class="mini">Viewers</div>
-                  <div class="value" id="viewerCount">0</div>
-                  <div class="sub">Started: <span id="startedAt">—</span></div>
-                </div>
-                <div class="info-card">
-                  <div class="mini">Last update</div>
-                  <div class="value" id="lastUpdate">—</div>
-                  <div class="sub">Signal status: <span id="watcherStatus">waiting for signal</span></div>
-                </div>
-                <div class="info-card">
-                  <div class="mini">Read window</div>
-                  <div class="value" id="ocrScope">Full player frame</div>
-                  <div class="sub" id="ocrNotes">Listening for the clearest omen on screen.</div>
-                </div>
+              <div class="info-card">
+                <div class="mini">Game</div>
+                <div class="value" id="gameName">Ready or Not</div>
+                <div class="sub">Current battlefield under examination.</div>
               </div>
-
-              <div class="ocr-output" id="ocrTextBlock" style="margin-top: 16px;">Waiting for the next omen...</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="section" id="exchange">
-        <div class="container">
-          <div class="section-head">
-            <h2>"Real" exchange.</h2>
-            <p>
-              "Real" Kalshi-style contracts, "real" cash, browser-local positions, and a Mooncoin side desk. Nothing settles except your reputation.
-            </p>
-          </div>
-
-          <div class="exchange-grid">
-            <div class="panel exchange-shell">
-              <div class="exchange-top">
-                <div>
-                  <div class="mini-label">"Real" market</div>
-                  <h3>Bet the phone with "real" money.</h3>
-                  <p>
-                    Buy YES or NO contracts priced in cents, mark them live against "real" odds, and rotate the winnings straight into Mooncoin if you want maximum quotation-mark leverage.
-                  </p>
-                </div>
-                <div class="exchange-actions">
-                  <button class="chip active" id="topUpBtn">Add "real" $2,500</button>
-                  <button class="chip" id="resetPaperBtn">Reset the ledger</button>
-                </div>
+              <div class="info-card">
+                <div class="mini">Attempt read</div>
+                <div class="value" id="attemptValue">468</div>
+                <div class="sub">Signal confidence: <span id="ocrConfidence">0.00</span> · <span id="heroConfidence">0.00</span></div>
               </div>
-
-              <div class="account-grid">
-                <div class="account-card">
-                  <div class="mini-label">Cash balance</div>
-                  <div class="account-value" id="paperCash">$10,000.00</div>
-                  <div class="account-sub" id="buyingPower">Buying power fully operational.</div>
-                </div>
-                <div class="account-card">
-                  <div class="mini-label">Portfolio value</div>
-                  <div class="account-value" id="portfolioValue">$10,000.00</div>
-                  <div class="account-sub" id="paperPnl">"Real" P/L $0.00</div>
-                </div>
-                <div class="account-card">
-                  <div class="mini-label">YES position</div>
-                  <div class="account-value" id="yesPosition">0 sh</div>
-                  <div class="account-sub" id="yesAvgPrice">Avg $0.00</div>
-                </div>
-                <div class="account-card">
-                  <div class="mini-label">NO position</div>
-                  <div class="account-value" id="noPosition">0 sh</div>
-                  <div class="account-sub" id="noAvgPrice">Avg $0.00</div>
-                </div>
-                <div class="account-card">
-                  <div class="mini-label">Mooncoin wallet</div>
-                  <div class="account-value" id="mooncoinWallet">0 MC</div>
-                  <div class="account-sub" id="mooncoinCostBasis">Basis $0.00</div>
-                </div>
+              <div class="info-card">
+                <div class="mini">Viewers</div>
+                <div class="value" id="viewerCount">0</div>
+                <div class="sub">Started: <span id="startedAt">—</span></div>
               </div>
-
-              <div class="desk-grid">
-                <div class="desk-card">
-                  <div class="mini-label">Kalshi desk</div>
-                  <h4>Contract ticket</h4>
-                  <div class="quote-gridline">
-                    <div class="quote-block yes">
-                      <div class="quote-label">YES market</div>
-                      <div class="quote-price" id="yesAsk">18c ask</div>
-                      <div class="quote-sub">bid <span id="yesBid">16c</span> • mark <span id="yesMark">17c</span></div>
-                    </div>
-                    <div class="quote-block no">
-                      <div class="quote-label">NO market</div>
-                      <div class="quote-price" id="noAsk">84c ask</div>
-                      <div class="quote-sub">bid <span id="noBid">82c</span> • mark <span id="noMark">83c</span></div>
-                    </div>
-                  </div>
-                  <div class="ticket-controls">
-                    <label class="ticket-label" for="contractQty">Contracts</label>
-                    <input class="ticket-input" id="contractQty" type="number" min="1" step="1" value="10" />
-                  </div>
-                  <div class="ticket-summary">
-                    <div class="summary-row">
-                      <span>YES estimate</span>
-                      <strong id="estimatedYesCost">$1.80</strong>
-                    </div>
-                    <div class="summary-row">
-                      <span>NO estimate</span>
-                      <strong id="estimatedNoCost">$8.40</strong>
-                    </div>
-                  </div>
-                  <div class="ticket-actions">
-                    <button class="trade-btn yes" id="buyYesBtn">Buy YES</button>
-                    <button class="trade-btn no" id="buyNoBtn">Buy NO</button>
-                    <button class="trade-btn ghost" id="sellYesBtn">Sell YES</button>
-                    <button class="trade-btn ghost" id="sellNoBtn">Sell NO</button>
-                  </div>
-                </div>
-
-                <div class="desk-card">
-                  <div class="mini-label">Mooncoin desk</div>
-                  <h4>Spot wallet</h4>
-                  <div class="mooncoin-hero">
-                    <div class="mooncoin-price" id="mooncoinPrice">$0.84</div>
-                    <div class="mooncoin-sub">24h move <span id="mooncoinDelta">+0.00%</span></div>
-                  </div>
-                  <div class="ticket-controls">
-                    <label class="ticket-label" for="mooncoinQty">Mooncoin</label>
-                    <input class="ticket-input" id="mooncoinQty" type="number" min="1" step="1" value="25" />
-                  </div>
-                  <div class="ticket-summary">
-                    <div class="summary-row">
-                      <span>Wallet value</span>
-                      <strong id="mooncoinWalletValue">$0.00</strong>
-                    </div>
-                    <div class="summary-row">
-                      <span>Order value</span>
-                      <strong id="mooncoinOrderValue">$21.00</strong>
-                    </div>
-                  </div>
-                  <div class="ticket-actions">
-                    <button class="trade-btn moon" id="buyMooncoinBtn">Buy Mooncoin</button>
-                    <button class="trade-btn ghost" id="sellMooncoinBtn">Sell Mooncoin</button>
+              <div class="info-card">
+                <div class="mini">Last update</div>
+                <div class="value" id="lastUpdate">—</div>
+                <div class="sub">Signal status: <span id="watcherStatus">waiting for signal</span></div>
+              </div>
+              <div class="info-card">
+                <div class="mini">Read window</div>
+                <div class="value" id="ocrScope">Full player frame</div>
+                <div class="sub" id="ocrNotes">Listening for the clearest omen on screen.</div>
+              </div>
+              <div class="info-card">
+                <div class="mini">AI water consumed</div>
+                <div class="value" id="heroWater">98,772,441 bottles</div>
+                <div class="sub">Generated per-keystroke, probably.</div>
+              </div>
+              <div class="info-card">
+                <div class="mini">Mooncoin desk</div>
+                <label class="value" for="mooncoinQty" style="display:block">Order size (MC)</label>
+                <div class="sub">
+                  <input class="ticket-input" id="mooncoinQty" type="number" min="1" step="1" value="25" placeholder="Mooncoin quantity" aria-label="Mooncoin quantity" style="margin-top:6px" />
+                  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+                    <button class="trade-btn moon" type="button" id="buyMooncoinBtn">Buy MC</button>
+                    <button class="trade-btn ghost" type="button" id="sellMooncoinBtn">Sell MC</button>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div class="panel blotter-shell">
-              <div class="mini-label">"Real" tape</div>
-              <h3>Live "real" fills.</h3>
-              <p>
-                "Real" prints, "real" positions, and browser persistence sturdy enough to preserve your quote-unquote fortune between reloads.
-              </p>
-              <div class="blotter-list" id="tradeLog"></div>
-            </div>
+            <div class="ocr-output" id="ocrTextBlock" style="margin-top: 16px;">Waiting for the next omen...</div>
           </div>
         </div>
       </section>
@@ -932,6 +1061,9 @@
         heroStatus: document.getElementById('heroStatus'),
         heroConfidence: document.getElementById('heroConfidence'),
         heroWater: document.getElementById('heroWater'),
+        tickerChance: document.getElementById('tickerChance'),
+        tickerDelta: document.getElementById('tickerDelta'),
+        tickerViewers: document.getElementById('tickerViewers'),
         contractQty: document.getElementById('contractQty'),
         mooncoinQty: document.getElementById('mooncoinQty'),
         paperCash: document.getElementById('paperCash'),
@@ -1923,8 +2055,21 @@
         els.volumeValue.textContent = dollars(paper.volume);
         els.liveState.textContent = isVodView ? 'LAST VOD' : (display.live ? 'LIVE' : 'OFFLINE');
         els.liveState.className = `value ${isVodView ? 'status-test' : (display.live ? 'status-live' : 'status-offline')}`;
-        els.heroStatus.textContent = isVodView ? 'VOD' : (display.live ? 'Live' : 'Offline');
-        els.heroStatus.className = `stat-value ${isVodView ? 'test' : (display.live ? 'glow' : '')}`;
+        const liveDotClass = (isVodView || !display.live) ? 'ticker-live-dot off' : 'ticker-live-dot';
+        const statusLabel = isVodView ? 'VOD' : (display.live ? 'Live' : 'Offline');
+        els.heroStatus.innerHTML = `<span class="${liveDotClass}"></span>${statusLabel}`;
+        els.heroStatus.className = `ticker-value ${isVodView ? 'dim' : (display.live ? 'glow' : 'dim')}`;
+        if (els.tickerChance) {
+          els.tickerChance.innerHTML = percentLabel(marketChance).replace('<', '&lt;');
+        }
+        if (els.tickerDelta) {
+          const deltaArrow = marketDelta > 0 ? '▲' : marketDelta < 0 ? '▼' : '•';
+          els.tickerDelta.textContent = `${deltaArrow} ${Math.abs(marketDelta).toFixed(1)}`;
+          els.tickerDelta.className = `ticker-value ${marketDelta > 0 ? 'up' : marketDelta < 0 ? 'down' : ''}`;
+        }
+        if (els.tickerViewers) {
+          els.tickerViewers.textContent = Number(display.viewer_count || 0).toLocaleString();
+        }
         els.streamTitle.textContent = display.title || '—';
         els.gameName.textContent = display.game_name || '—';
         els.attemptValue.textContent = display.attempt ?? '—';
