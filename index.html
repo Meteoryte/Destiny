@@ -119,10 +119,20 @@
       .stat-card {
         padding: 16px; border-radius: 20px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
       }
+      .stat-card.featured {
+        grid-column: 1 / -1;
+        padding: 20px 22px;
+        background: linear-gradient(135deg, rgba(98,239,255,0.10), rgba(151,255,224,0.06));
+        border-color: rgba(151,255,224,0.22);
+      }
       .stat-label {
         color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase;
       }
-      .stat-value { margin-top: 10px; font-size: 24px; font-weight: 800; letter-spacing: -0.04em; }
+      .stat-value { margin-top: 10px; font-size: 24px; font-weight: 800; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+      .stat-card.featured .stat-value {
+        font-size: clamp(52px, 9vw, 92px); line-height: 0.92; letter-spacing: -0.06em;
+        color: #eafffb; text-shadow: 0 0 32px rgba(151,255,224,0.28);
+      }
       .stat-value.compact { font-size: clamp(18px, 2.4vw, 22px); line-height: 1.15; }
       .stat-value.glow { color: #97ffe0; text-shadow: 0 0 22px rgba(151,255,224,0.26); }
       .stat-value.test { color: #8fecff; text-shadow: 0 0 22px rgba(98,239,255,0.22); }
@@ -156,7 +166,7 @@
       }
       .market-meta { margin-top: 24px; }
       .big-chance { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-      .big-chance-value { font-size: clamp(56px, 8vw, 72px); line-height: 0.9; font-weight: 700; letter-spacing: -0.08em; }
+      .big-chance-value { font-size: clamp(56px, 8vw, 72px); line-height: 0.9; font-weight: 700; letter-spacing: -0.08em; font-variant-numeric: tabular-nums; }
       .chance-word { color: #7f8999; font-size: 18px; padding-top: 12px; }
       .delta { color: var(--red); font-weight: 800; padding-top: 13px; font-size: 18px; }
       .brand-mark { font-size: clamp(24px, 4vw, 44px); font-weight: 800; color: var(--green); letter-spacing: -0.05em; }
@@ -175,7 +185,9 @@
       }
       .range-btn.active, .chip.active { background: rgba(255,255,255,0.10); color: #fff; border-color: rgba(255,255,255,0.1); }
       .tiny-note { margin-top: 16px; text-align: center; color: rgba(255,255,255,0.22); font-size: 13px; letter-spacing: 0.03em; }
-      .oba { position: absolute; right: 0; bottom: 0; width: 110px; height: 126px; opacity: 0.98; }
+      .oba { position: absolute; right: 14px; bottom: -6px; width: 76px; height: 86px; opacity: 0.85; pointer-events: none; z-index: 0; }
+      .market-footer { position: relative; z-index: 2; }
+      .tiny-note { position: relative; z-index: 2; }
 
       .embed-shell, .info-shell, .copypasta-card, .quote-card, .footer-card, .pillars .panel { padding: 20px; }
       .embed-top {
@@ -218,7 +230,7 @@
         padding: 16px; border-radius: 18px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06);
       }
       .info-card .mini { color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; font-size: 11px; font-weight: 800; }
-      .info-card .value { margin-top: 10px; font-size: 22px; line-height: 1.15; font-weight: 800; letter-spacing: -0.03em; }
+      .info-card .value { margin-top: 10px; font-size: 22px; line-height: 1.15; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
       .info-card .sub { margin-top: 8px; color: #c7d0e0; line-height: 1.65; font-size: 14px; }
       .status-live { color: #98ffe0; }
       .status-offline { color: #ffd0d0; }
@@ -389,6 +401,13 @@
         .hero-stats, .info-grid, .account-grid, .desk-grid, .quote-gridline, .ticket-actions { grid-template-columns: 1fr; }
         .market-title { max-width: 100%; }
         .chart-times { font-size: 12px; }
+        .nav-links {
+          width: 100%; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px;
+          scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .nav-links::-webkit-scrollbar { display: none; }
+        .nav-links a { flex-shrink: 0; }
+        .hero-grid { display: flex; flex-direction: column-reverse; gap: 20px; }
       }
     </style>
   </head>
@@ -427,8 +446,8 @@
               <a class="secondary" href="#copypasta">Load psychosis mode</a>
             </div>
             <div class="hero-stats">
-              <div class="stat-card">
-                <div class="stat-label">Attempt</div>
+              <div class="stat-card featured">
+                <div class="stat-label">Current attempt</div>
                 <div class="stat-value" id="heroAttempt">#468</div>
               </div>
               <div class="stat-card">
@@ -442,10 +461,6 @@
               <div class="stat-card">
                 <div class="stat-label">AI water consumed</div>
                 <div class="stat-value compact" id="heroWater">98,772,441 bottles</div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-label">Doctrine</div>
-                <div class="stat-value">This is the one</div>
               </div>
             </div>
           </div>
@@ -986,6 +1001,15 @@
         const d = new Date(value);
         if (Number.isNaN(d.getTime())) return value;
         return d.toLocaleString();
+      }
+
+      function friendlyWatcherStatus(raw, isLive, isVodView) {
+        const text = String(raw || '').trim();
+        if (!text) return isVodView ? 'archive selected' : 'waiting for signal';
+        if (/\b(error|failed|unavailable|timed out)\b/i.test(text)) {
+          return isLive ? 'refreshing signal…' : 'signal paused';
+        }
+        return text;
       }
 
       function clampValue(value, min, max) {
@@ -1907,7 +1931,7 @@
         els.viewerCount.textContent = Number(display.viewer_count || 0).toLocaleString();
         els.startedAt.textContent = fmtTime(display.started_at);
         els.lastUpdate.textContent = fmtTime(display.last_update);
-        els.watcherStatus.textContent = display.watcher_status || (isVodView ? 'archive selected' : 'waiting for signal');
+        els.watcherStatus.textContent = friendlyWatcherStatus(display.watcher_status, display.live, isVodView);
         els.ocrConfidence.textContent = (display.ocr_confidence ?? 0).toFixed(2);
         els.ocrScope.textContent = ocrScopeLabel;
         els.ocrNotes.textContent = display.notes || (isVodView ? 'Last VOD selected.' : 'Listening for a clear omen.');
